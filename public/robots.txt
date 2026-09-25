@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /portal
+Disallow: /ticket
+
+Sitemap: https://vfmbs.vercel.app/sitemap.xml

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://vfmbs.vercel.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://vfmbs.vercel.app/events</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vfmbs.vercel.app/workshops</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://vfmbs.vercel.app/team</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://vfmbs.vercel.app/journal</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://vfmbs.vercel.app/partners</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://vfmbs.vercel.app/about</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://vfmbs.vercel.app/apply</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://vfmbs.vercel.app/contact</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://vfmbs.vercel.app/privacy</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+</urlset>
