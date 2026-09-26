@@ -483,12 +483,13 @@
     const ev = V.C.events.find((e) => e.id === id);
     const t = Store.tickets()[id];
     if (!ev || !t) return;
+    if (V.sfx) for (let i = 0; i < 16; i++) setTimeout(() => V.sfx.tick(), 250 + i * 95);
     openModal(`
       <div class="modal-pad">
         <div class="eyebrow">${t.waitlist ? "You're on the list" : "You're going"}</div>
         <h2 style="margin-bottom:22px">${t.waitlist ? "Standby confirmed." : "See you at the premiere."}</h2>
         ${t.demo ? demoNote() : ""}
-        ${ticketHTML(ev, t)}
+        <div class="printer"><div class="slot" aria-hidden="true"></div>${ticketHTML(ev, t)}</div>
         <div class="ticket-tools" style="margin-top:22px">
           ${t.token ? `<a class="btn btn-primary btn-sm" href="/ticket?t=${encodeURIComponent(t.token)}">${icons.ticket} Open full ticket</a>` : ""}
           <button class="btn btn-outline btn-sm" data-ics="${ev.id}">${icons.cal} Add to calendar</button>
@@ -757,7 +758,11 @@
 
   /* ---------------- Boot ---------------- */
   if (page !== "admin") {
-    $$("[data-motif]").forEach((el) => (el.innerHTML = V.motifs[el.dataset.motif] || ""));
+    $$(".page-hero > .art[data-palette]").forEach((a) => {
+      const pal = a.dataset.palette, C = V.inks[pal] || V.inks.gold, m = a.querySelector("[data-motif]")?.dataset.motif;
+      a.style.cssText += `;--bg:${C[0]};--ink:${C[1]};--acc:${C[2]}`;
+      a.innerHTML = V.poster(pal, m, page);
+    });
     renderNav();
     searchApi = initSearch();
     initScroll();

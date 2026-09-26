@@ -231,9 +231,124 @@
     const [a1, a2, a3] = V.palettes[palette] || V.palettes.gold;
     return `--a1:${a1};--a2:${a2};--a3:${a3}`;
   };
+  /* ---------------- Poster art: Saul Bass–style cut-paper duotones ----------------
+     Deterministic per (palette, motif, seed). Flat inks, hand-cut edges, screen-print
+     misregistration. No gradients, no clip-art. */
+  V.inks = {
+    gold: ["#0d0b08", "#f2ede4", "#cfae70"],
+    crimson: ["#f2ede4", "#0b0b0b", "#c8231e"],
+    cobalt: ["#0f2340", "#f2ede4", "#e8b04a"],
+    emerald: ["#0e2a23", "#efe6d2", "#e4572e"],
+    violet: ["#1c1030", "#f2ede4", "#f2c14e"],
+    ember: ["#e2572a", "#111111", "#f2ede4"],
+    mono: ["#121212", "#ececec", "#8a8a8a"],
+    teal: ["#0f3a3f", "#f2ede4", "#f25f3a"],
+    cream: ["#f2ede4", "#111111", "#cfae70"],
+  };
+  const rng = (seed) => { let a = V.hash(seed); return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
+  const f1 = (n) => Math.round(n * 10) / 10;
+  const LAYOUT = { chart: "bars", building: "skyline", palm: "sun", film: "vortex", reel: "vortex", spotlight: "burst", star: "burst", camera: "eye", play: "eye", mic: "eye", trophy: "shards", rocket: "shards", ticket: "ticket", popcorn: "ticket", coffee: "waves", music: "waves", clapper: "cut", handshake: "cut" };
+  const BASS = {
+    bars(r, [bg, ink, acc]) {
+      const n = 6 + Math.floor(r() * 5), w = 100 / n, k = Math.floor(r() * n);
+      let s = "";
+      for (let i = 0; i < n; i++) {
+        const x = i * w, h = 18 + r() * 72, c = (r() - 0.5) * 16;
+        s += `<polygon points="${f1(x + 0.9)},101 ${f1(x + w - 0.9)},101 ${f1(x + w - 0.9)},${f1(100 - h + c)} ${f1(x + 0.9)},${f1(100 - h - c)}" fill="${i === k ? acc : ink}"/>`;
+      }
+      return s + `<rect x="0" y="${f1(8 + r() * 20)}" width="100" height="2.2" fill="${acc}"/>`;
+    },
+    vortex(r, [bg, ink, acc]) {
+      let s = "";
+      const cx = 55 + r() * 20, cy = 45 + r() * 12, rot = 7 + r() * 8;
+      for (let i = 0; i < 14; i++) {
+        const z = 120 - i * 8.2;
+        s += `<rect x="${f1(cx - z / 2)}" y="${f1(cy - z / 2)}" width="${f1(z)}" height="${f1(z)}" fill="${i % 2 ? bg : i === 9 ? acc : ink}" transform="rotate(${f1(i * rot)} ${f1(cx)} ${f1(cy)})"/>`;
+      }
+      return s;
+    },
+    eye(r, [bg, ink, acc]) {
+      const cx = 40 + r() * 30, cy = 42 + r() * 14, R = 30 + r() * 10;
+      return `<rect x="-5" y="${f1(cy + R * 0.2)}" width="110" height="${f1(12 + r() * 10)}" fill="${acc}" transform="rotate(${f1(-8 + r() * 6)} 50 50)"/>
+        <circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(R)}" fill="${ink}"/>
+        <rect x="${f1(cx - R - 2)}" y="${f1(cy - 2.4)}" width="${f1(R * 2 + 4)}" height="4.8" fill="${bg}"/>
+        <circle cx="${f1(cx + R * 0.32)}" cy="${f1(cy - R * 0.34)}" r="${f1(R * 0.22)}" fill="${acc}"/>`;
+    },
+    shards(r, [bg, ink, acc]) {
+      const ox = 20 + r() * 60, oy = 30 + r() * 40;
+      let s = "";
+      for (let i = 0; i < 9; i++) {
+        const a1 = r() * 6.283, a2 = a1 + 0.18 + r() * 0.35, L = 80 + r() * 60;
+        s += `<polygon points="${f1(ox)},${f1(oy)} ${f1(ox + Math.cos(a1) * L)},${f1(oy + Math.sin(a1) * L)} ${f1(ox + Math.cos(a2) * L)},${f1(oy + Math.sin(a2) * L)}" fill="${i % 4 === 0 ? acc : ink}"/>`;
+      }
+      return s + `<circle cx="${f1(ox)}" cy="${f1(oy)}" r="${f1(5 + r() * 4)}" fill="${bg}"/>`;
+    },
+    ticket(r, [bg, ink, acc]) {
+      const rot = -12 + r() * 10, no = V.pad(1 + Math.floor(r() * 98));
+      return `<g transform="rotate(${f1(rot)} 50 50)"><rect x="8" y="24" width="96" height="52" fill="${acc}"/>
+        <circle cx="8" cy="50" r="7" fill="${bg}"/><circle cx="104" cy="50" r="7" fill="${bg}"/>
+        <line x1="76" y1="26" x2="76" y2="74" stroke="${bg}" stroke-width="1.4" stroke-dasharray="2.2 2.2"/>
+        <text x="16" y="66" font-family="Bebas Neue, Impact, sans-serif" font-size="34" fill="${ink}">No ${no}</text>
+        <text x="16" y="36" font-family="JetBrains Mono, monospace" font-size="4.2" letter-spacing="1.2" fill="${ink}">ADMIT ONE · VFMBS</text></g>`;
+    },
+    waves(r, [bg, ink, acc]) {
+      let s = "";
+      const amp = 4 + r() * 5, fq = 1 + r() * 2;
+      for (let i = 0; i < 9; i++) {
+        const y = 8 + i * 11;
+        let d = `M-5 ${y}`;
+        for (let x = -5; x <= 105; x += 5) d += ` L${x} ${f1(y + Math.sin((x / 100) * 6.283 * fq + i * 0.7) * amp)}`;
+        s += `<path d="${d}" fill="none" stroke="${i === 4 ? acc : ink}" stroke-width="${i === 4 ? 5 : 3.2}"/>`;
+      }
+      return s;
+    },
+    burst(r, [bg, ink, acc]) {
+      const cx = 30 + r() * 40, cy = 35 + r() * 30, n = 18;
+      let s = "";
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * 6.283 + r() * 0.05, b = a + 6.283 / n / 2;
+        s += `<polygon points="${f1(cx)},${f1(cy)} ${f1(cx + Math.cos(a) * 160)},${f1(cy + Math.sin(a) * 160)} ${f1(cx + Math.cos(b) * 160)},${f1(cy + Math.sin(b) * 160)}" fill="${ink}"/>`;
+      }
+      return s + `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(12 + r() * 8)}" fill="${acc}"/><circle cx="${f1(cx)}" cy="${f1(cy)}" r="4" fill="${bg}"/>`;
+    },
+    skyline(r, [bg, ink, acc]) {
+      let s = `<circle cx="${f1(20 + r() * 60)}" cy="${f1(22 + r() * 12)}" r="${f1(10 + r() * 6)}" fill="${acc}"/>`, x = -2;
+      while (x < 102) {
+        const w = 7 + r() * 12, h = 25 + r() * 55;
+        s += `<rect x="${f1(x)}" y="${f1(100 - h)}" width="${f1(w)}" height="${f1(h)}" fill="${ink}"/>`;
+        for (let wy = 100 - h + 4; wy < 96; wy += 6) for (let wx = x + 2; wx < x + w - 2; wx += 4) if (r() > 0.55) s += `<rect x="${f1(wx)}" y="${f1(wy)}" width="1.6" height="2.4" fill="${bg}"/>`;
+        x += w + 1.2;
+      }
+      return s;
+    },
+    sun(r, [bg, ink, acc]) {
+      const cy = 48 + r() * 10;
+      let s = `<circle cx="50" cy="${f1(cy)}" r="30" fill="${acc}"/>`;
+      for (let i = 0; i < 6; i++) s += `<rect x="0" y="${f1(cy - 4 + i * 5.5)}" width="100" height="${f1(1.2 + i * 0.5)}" fill="${bg}"/>`;
+      return s + `<polygon points="-5,101 -5,${f1(78 + r() * 8)} 30,${f1(70 + r() * 6)} 60,${f1(80 + r() * 6)} 105,${f1(68 + r() * 8)} 105,101" fill="${ink}"/>`;
+    },
+    cut(r, [bg, ink, acc]) {
+      const pts = [];
+      const cx = 45 + r() * 20, cy = 50, n = 7;
+      for (let i = 0; i < n; i++) { const a = (i / n) * 6.283 + r() * 0.5, R = 22 + r() * 40; pts.push(`${f1(cx + Math.cos(a) * R)},${f1(cy + Math.sin(a) * R)}`); }
+      return `<polygon points="${pts.join(" ")}" fill="${ink}"/>
+        <circle cx="${f1(15 + r() * 70)}" cy="${f1(15 + r() * 25)}" r="${f1(7 + r() * 8)}" fill="${acc}"/>
+        <rect x="-5" y="${f1(70 + r() * 18)}" width="110" height="1.6" fill="${acc}" transform="rotate(${f1(-6 + r() * 12)} 50 50)"/>
+        <rect x="${f1(60 + r() * 20)}" y="-5" width="${f1(3 + r() * 4)}" height="110" fill="${bg}" transform="rotate(${f1(8 + r() * 10)} 50 50)"/>`;
+    },
+  };
+  V.poster = (palette = "gold", motif = "film", seed = "") => {
+    const C = V.inks[palette] || V.inks.gold;
+    const kind = LAYOUT[motif] || "cut";
+    const r = rng(`${palette}|${motif}|${seed}`);
+    // misregistration: accent layer printed a hair off
+    const body = BASS[kind](r, C);
+    return `<svg class="bass" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="100" height="100" fill="${C[0]}"/><g class="ink">${body}</g></svg>`;
+  };
   V.art = (palette = "gold", motif = "film", opts = {}) => {
     const img = V.safeUrl(opts.image);
-    return `<div class="art ${img ? "has-img" : ""}" style="${V.vars(palette)}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async">` : ""}${opts.beam ? '<div class="beam"></div>' : ""}<div class="glow"></div>${motif && !img ? `<div class="motif">${V.motifs[motif] || ""}</div>` : ""}</div>`;
+    const C = V.inks[palette] || V.inks.gold;
+    return `<div class="art ${img ? "has-img" : ""}" style="${V.vars(palette)};--bg:${C[0]};--ink:${C[1]};--acc:${C[2]}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async">` : V.poster(palette, motif, opts.seed || "")}${opts.beam ? '<div class="beam"></div>' : ""}</div>`;
   };
 
   /* ---------------- QR (vendored qrcode-generator, MIT) ---------------- */

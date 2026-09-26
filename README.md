@@ -8,6 +8,19 @@ The official website for VFMBS: a cinematic, streaming-inspired site with real e
 
 ---
 
+## 🎬 The cinema layer
+
+The site is built to feel like a night at the movies:
+
+- **Pre-show → leader countdown → velvet curtains** on the first visit each session (visitors choose "with sound" or "silently").
+- **WebGL projector theater** on the home page: a volumetric beam, floating dust, audience silhouettes and a screen playing the featured title cards with gate weave and splice cuts.
+- **Celluloid everywhere:** a 24fps WebGL film layer adds grain, scratches, dust, hair, flicker and light leaks, and pages change with a **film-burn** transition.
+- **Saul Bass–style posters** are generated for every event, workshop, story and track (or use a real photo, which gets a duotone treatment).
+- **Scenes:** a marquee with chasing bulbs and hanging letters, a draggable 35mm film strip, a pinned main-title sequence, storyboard panels, a split-flap box office board, a "Starring" billing block with rack focus, a trade-paper front page and a tear-off ticket.
+- **Camera UI:** an autofocus viewfinder cursor, letterbox bars that change aspect ratio per scene, a timecode HUD and an optional synthesized projector soundtrack (toggle it at the bottom right).
+
+Everything degrades gracefully: reduced-motion settings disable the effects, touch devices skip the cursor, and browsers without WebGL fall back to CSS.
+
 ## 🚀 Deploy to Vercel (about 10 minutes)
 
 1. **Import the repo:** go to [vercel.com/new](https://vercel.com/new), pick this GitHub repo, and click **Deploy**. No build settings are needed (`vercel.json` handles everything).

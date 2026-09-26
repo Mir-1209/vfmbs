@@ -25,91 +25,141 @@
 <link rel="preload" href="/assets/fonts/Inter-normal-300-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/fonts.css">
 <link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/cinema.css">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Vanderbilt Film & Media Business Society", "alternateName": "VFMBS", "url": "https://vfmbs.vercel.app", "logo": "https://vfmbs.vercel.app/assets/brand/logo.svg", "email": "vfmbs@vanderbilt.edu", "parentOrganization": {"@type": "CollegeOrUniversity", "name": "Vanderbilt University"}, "address": {"@type": "PostalAddress", "addressLocality": "Nashville", "addressRegion": "TN", "addressCountry": "US"}}</script>
 </head>
 <body data-page="home">
 <main id="main">
-  <section class="billboard letterbox" id="billboard" aria-label="Featured">
-    <div class="frame-marks" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <h1 class="sr-only">Vanderbilt Film &amp; Media Business Society: the business behind the screen</h1>
+
+  <!-- SC.01 THE THEATER -->
+  <section class="theater" id="theater" data-scene="SC.01 · INT. THEATER · NIGHT">
+    <canvas class="theater-gl" id="theater-gl" aria-hidden="true"></canvas>
+    <div class="valance" aria-hidden="true"></div>
+    <div class="drape l" aria-hidden="true"></div><div class="drape r" aria-hidden="true"></div>
+    <div class="screen" id="screen" role="button" tabindex="0" aria-label="Now playing on the screen" data-cursor="Watch">
+      <div class="screen-inner" id="screen-inner"></div>
+      <div class="screen-scratch" aria-hidden="true"></div>
+    </div>
+    <div class="theater-ui">
+      <div class="house mono"><span class="rec-dot"></span><span id="house"></span><span class="sep">/</span><span id="screen-count">01 / 01</span></div>
+      <div class="actions"><a class="btn btn-gold btn-lg magnetic" href="/apply" data-cursor="Get cast">Get your ticket · Apply</a><a class="btn btn-ghost btn-lg" href="#reel" data-cursor="Program">See the program</a></div>
+    </div>
+    <div class="seats" id="seats" aria-hidden="true"></div>
+    <div class="exit-sign" aria-hidden="true">EXIT</div>
   </section>
-  <div class="rows" id="rows"></div>
-  <div class="ticker" id="ticker" aria-label="Illustrative industry index"></div>
 
-  <section class="marquee-big" aria-hidden="true"><div class="mq"><span>FINANCE <img src="/assets/brand/logo.svg" alt=""> <em>film</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">MEDIA ✦ ENTERTAINMENT ✦</span><span>DEALS <img src="/assets/brand/logo.svg" alt=""> <em>&amp; dollars</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">BEHIND THE SCREEN ✦</span><span>FINANCE <img src="/assets/brand/logo.svg" alt=""> <em>film</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">MEDIA ✦ ENTERTAINMENT ✦</span><span>DEALS <img src="/assets/brand/logo.svg" alt=""> <em>&amp; dollars</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">BEHIND THE SCREEN ✦</span></div></section>
-
-  <section class="section manifesto">
-    <div class="container">
-      <p class="eyebrow reveal">Our mission</p>
-      <p class="m-text">We study the business behind the screen: the <em>deals,</em> the dollars and the decisions that decide what the world watches. Finance, film, media and entertainment, <em>all in one room.</em></p>
-      <div class="sign reveal"><img src="/assets/brand/logo.svg" alt=""><div><div class="serif-it" style="font-size:20px">The Board</div><div class="mono">Vanderbilt Film &amp; Media Business Society</div></div></div>
+  <!-- SC.02 MARQUEE -->
+  <section class="marquee-scene" data-scene="SC.02 · EXT. MARQUEE · NIGHT">
+    <div class="marquee-sign">
+      <div class="bulbs top"></div><div class="bulbs bottom"></div><div class="bulbs left"></div><div class="bulbs right"></div>
+      <div class="mq-crown"><img src="/assets/brand/logo.svg" alt=""><span>VFMBS</span><em>Picture House</em></div>
+      <div class="mq-now">Now showing</div>
+      <div class="mq-rows" id="marquee-rows"></div>
+      <a class="mq-all" href="/events" data-cursor="All events">Full program ▸</a>
     </div>
   </section>
 
-  <section class="pipeline" aria-label="From script to screen">
+  <section class="marquee-big" aria-hidden="true"><div class="mq"><span>FINANCE <img src="/assets/brand/logo.svg" alt=""> <em>film</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">MEDIA ✦ ENTERTAINMENT ✦</span><span>DEALS <img src="/assets/brand/logo.svg" alt=""> <em>&amp; dollars</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">BEHIND THE SCREEN ✦</span><span>FINANCE <img src="/assets/brand/logo.svg" alt=""> <em>film</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">MEDIA ✦ ENTERTAINMENT ✦</span><span>DEALS <img src="/assets/brand/logo.svg" alt=""> <em>&amp; dollars</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">BEHIND THE SCREEN ✦</span></div></section>
+
+  <!-- SC.03 THE REEL -->
+  <section class="reel" id="reel" data-scene="SC.03 · THE PROGRAM">
+    <div class="container reel-head">
+      <div><p class="eyebrow">Reel 01 · The program</p><h2 class="h2" style="margin:0">Drag the <em>film.</em></h2></div>
+      <div class="reel-ctl"><span class="mono" id="reel-ft">0000 FT</span><div class="reel-meter" id="reel-meter"><i></i></div><button class="icon-btn" id="reel-prev" aria-label="Previous">‹</button><button class="icon-btn" id="reel-next" aria-label="Next">›</button></div>
+    </div>
+    <div class="reel-viewport" id="reel-viewport" data-cursor="Drag">
+      <div class="reel-film">
+        <div class="reel-edge" id="reel-edge-t" aria-hidden="true"></div>
+        <div class="reel-strip" id="reel-strip"></div>
+        <div class="reel-edge b" id="reel-edge-b" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SC.04 MAIN TITLES -->
+  <section class="seq" data-seq data-aspect="2.39" data-scene="SC.04 · MAIN TITLES">
+    <div class="seq-stage">
+      <div class="seq-card c1"><div class="seq-art bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><h2><span>Every film</span><span>has two</span><span><em>scripts.</em></span></h2></div>
+      <div class="seq-card c2"><div class="seq-art eye"><i></i><b></b></div><h2><span>One is written</span><span>for the <em>screen.</em></span></h2></div>
+      <div class="seq-card c3"><div class="seq-art shards"><i></i><i></i><i></i><i></i><i></i></div><h2><span>The other is</span><span>written in</span><span><em>money.</em></span></h2></div>
+      <div class="seq-card c4"><div class="seq-art vortex"><i></i><i></i><i></i><i></i><i></i><i></i><img src="/assets/brand/logo.svg" alt=""></div><h2><span>We teach you</span><span>to read <em>both.</em></span></h2></div>
+      <div class="seq-slate mono"><span>MAIN TITLES</span><span>DESIGNED IN THE SPIRIT OF THE GREATS</span></div>
+    </div>
+  </section>
+
+  <!-- SC.05 STORYBOARD -->
+  <section class="pipeline storyboard" aria-label="From script to screen" data-scene="SC.05 · STORYBOARD">
     <div class="pipe-sticky">
       <div class="pipe-head">
-        <div><p class="eyebrow">From script to screen</p><h2 class="h2" style="margin:0">How a film <em>gets made</em><br>(and paid for).</h2></div>
-        <p class="lede" style="margin:0;max-width:420px">Five stages, five chances to learn the business. Keep scrolling. Every stage maps to a VFMBS track, workshop or trek.</p>
+        <div><p class="eyebrow">Storyboard · From script to screen</p><h2 class="h2" style="margin:0">How a film <em>gets made</em><br>(and paid for).</h2></div>
+        <p class="lede" style="margin:0;max-width:420px">Five shots. Every stage of a film's life maps to a VFMBS track, workshop or trek. Keep scrolling to dolly through.</p>
       </div>
       <div class="pipe-track" id="pipe-track"></div>
       <div class="pipe-progress"><i></i></div>
     </div>
   </section>
 
-  <section class="section-tight"><div class="container"><div class="stats" id="stats"></div></div></section>
-
-  <section class="section" id="tracks-section">
+  <!-- SC.06 BOX OFFICE -->
+  <section class="section boxoffice" data-scene="SC.06 · THE NUMBERS">
     <div class="container">
-      <div class="sec-head">
-        <div><p class="eyebrow">Now casting · Four tracks</p><h2 class="h-display" data-split style="margin:0">Pick your <em>role</em><br>in the industry.</h2></div>
-        <p class="lede reveal">Every member joins a track: a small team that meets weekly, runs real projects and goes deep on one corner of the entertainment economy.</p>
-      </div>
-      <div class="tracks" id="tracks"></div>
+      <div class="sec-head"><div><p class="eyebrow">Box office</p><h2 class="h2" style="margin:0">The <em>numbers.</em></h2></div><p class="lede">Updated every season. Arrivals only, no departures.</p></div>
+      <div class="departure" id="board"></div>
     </div>
   </section>
 
-  <section class="section pt0"><div class="container"><div class="sim reveal spot" id="sim"></div></div></section>
-
-  <section class="section pt0" id="mag-section">
+  <!-- SC.07 STARRING -->
+  <section class="section starring" data-aspect="1.85" data-scene="SC.07 · THE CAST">
     <div class="container">
-      <div class="sec-head"><div><p class="eyebrow">The Journal</p><h2 class="h2" style="margin:0">The <em>Reel.</em></h2></div><a class="link-arrow" href="/journal">All stories →</a></div>
-      <div class="mag" id="mag"></div>
+      <p class="eyebrow">Four tracks · pick your role</p>
+      <div class="starring-word" aria-hidden="true">Starring</div>
+      <div class="billing rack" id="billing"></div>
+      <p class="billing-fine">A VFMBS production · Written by you · Financed by the Deal Desk · Distributed across Nashville · No experience required · All majors welcome · Filmed on location at Vanderbilt University</p>
     </div>
+    <div class="bill-peek" id="bill-peek" aria-hidden="true"></div>
   </section>
 
-  <section class="section pt0">
-    <div class="container">
-      <div class="sec-head"><div><p class="eyebrow">Partners</p><h2 class="h2" style="margin:0">In good <em>company.</em></h2></div><a class="btn btn-outline btn-sm" href="/partners">Partner with us</a></div>
-      <div id="partners-strip" class="reveal"></div>
-    </div>
-  </section>
+  <!-- SC.08 THE PITCH -->
+  <section class="section pt0" data-scene="SC.08 · THE PITCH MEETING"><div class="container"><div class="sim reveal spot" id="sim"></div></div></section>
 
-  <section class="section pt0">
+  <!-- SC.09 THE TRADES -->
+  <section class="section trades-scene" data-scene="SC.09 · THE TRADES"><div class="container"><div class="trades reveal" id="trades"></div></div></section>
+
+  <!-- SC.10 REVIEWS -->
+  <section class="section reviews-scene" data-scene="SC.10 · THE REVIEWS">
     <div class="container">
       <div class="laurels reveal"><div class="laurel"><svg viewBox="0 0 40 70" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M35 68C12 55 4 30 14 4M14 14c-6-2-9 2-9 2s4 3 9 0M11 26c-6-1-9 3-9 3s5 3 9-1M10 38c-6 0-8 5-8 5s5 2 9-2M13 50c-5 1-7 6-7 6s5 1 8-3M19 60c-4 2-5 7-5 7s5 0 7-4"/></svg><div class="laurel-txt">Now casting<b>Fall 2026</b>All majors welcome</div><div style="transform:scaleX(-1)"><svg viewBox="0 0 40 70" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M35 68C12 55 4 30 14 4M14 14c-6-2-9 2-9 2s4 3 9 0M11 26c-6-1-9 3-9 3s5 3 9-1M10 38c-6 0-8 5-8 5s5 2 9-2M13 50c-5 1-7 6-7 6s5 1 8-3M19 60c-4 2-5 7-5 7s5 0 7-4"/></svg></div></div><div class="laurel"><svg viewBox="0 0 40 70" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M35 68C12 55 4 30 14 4M14 14c-6-2-9 2-9 2s4 3 9 0M11 26c-6-1-9 3-9 3s5 3 9-1M10 38c-6 0-8 5-8 5s5 2 9-2M13 50c-5 1-7 6-7 6s5 1 8-3M19 60c-4 2-5 7-5 7s5 0 7-4"/></svg><div class="laurel-txt">Where<b>Finance × Film</b>Meet</div><div style="transform:scaleX(-1)"><svg viewBox="0 0 40 70" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M35 68C12 55 4 30 14 4M14 14c-6-2-9 2-9 2s4 3 9 0M11 26c-6-1-9 3-9 3s5 3 9-1M10 38c-6 0-8 5-8 5s5 2 9-2M13 50c-5 1-7 6-7 6s5 1 8-3M19 60c-4 2-5 7-5 7s5 0 7-4"/></svg></div></div><div class="laurel"><svg viewBox="0 0 40 70" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M35 68C12 55 4 30 14 4M14 14c-6-2-9 2-9 2s4 3 9 0M11 26c-6-1-9 3-9 3s5 3 9-1M10 38c-6 0-8 5-8 5s5 2 9-2M13 50c-5 1-7 6-7 6s5 1 8-3M19 60c-4 2-5 7-5 7s5 0 7-4"/></svg><div class="laurel-txt">Filmed on location<b>Nashville</b>Music City</div><div style="transform:scaleX(-1)"><svg viewBox="0 0 40 70" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M35 68C12 55 4 30 14 4M14 14c-6-2-9 2-9 2s4 3 9 0M11 26c-6-1-9 3-9 3s5 3 9-1M10 38c-6 0-8 5-8 5s5 2 9-2M13 50c-5 1-7 6-7 6s5 1 8-3M19 60c-4 2-5 7-5 7s5 0 7-4"/></svg></div></div></div>
-      <div class="reviews" id="reviews"></div>
+      <div class="blurbs" id="reviews"></div>
     </div>
   </section>
 
-  <section class="section pt0">
+  <!-- SC.11 TICKET BOOTH -->
+  <section class="section booth" data-aspect="1.85" data-scene="SC.11 · THE BOX OFFICE">
     <div class="container">
-      <div class="cta-band reveal">
-        <div class="art" style="--a1:#2a2620;--a2:#4a3814;--a3:#cfae70"><div class="beam"></div><div class="glow"></div></div>
-        <p class="eyebrow center" id="cta-eyebrow">Casting call closes in</p>
-        <div class="countdown" id="countdown"></div>
-        <h2 class="h2">Your first credit <em>starts here.</em></h2>
-        <p class="lede" style="margin:0 auto 28px">No experience required. Just curiosity about how the entertainment business really works.</p>
-        <div class="actions" style="justify-content:center"><a class="btn btn-gold btn-lg magnetic" href="/apply">Apply now</a><a class="btn btn-ghost btn-lg" href="/events">See events</a></div>
+      <p class="eyebrow center">The box office is open</p>
+      <h2 class="h-display center" data-split>Your first credit <em>starts here.</em></h2>
+      <p class="lede center" id="booth-line" style="margin:0 auto 10px"></p>
+      <div class="countdown" id="countdown"></div>
+      <div class="big-ticket" id="big-ticket" data-tilt>
+        <div class="bt-main">
+          <span class="bt-admit">Admit one · Casting call</span>
+          <b>VFMBS</b>
+          <span class="bt-sub">The business behind the screen · Season 2026 · All majors</span>
+          <div class="bt-grid"><div><span>Row</span>Front</div><div><span>Seat</span>Yours</div><div><span>Price</span>$0</div></div>
+        </div>
+        <button class="bt-stub" aria-label="Tear the stub to apply" data-cursor="Tear"><span>Tear here</span><b>APPLY</b><em>→</em></button>
       </div>
+      <p class="center mono" style="margin-top:22px">Drag or click the stub to tear it · <a class="gold" href="/apply">or just apply ▸</a></p>
     </div>
   </section>
 
-  <section class="section pt0" id="faq">
+  <!-- SC.12 Q&A -->
+  <section class="section pt0" id="faq" data-scene="SC.12 · POST-SCREENING Q&amp;A">
     <div class="container">
-      <h2 class="h2 center reveal">Frequently asked <em>questions</em></h2>
+      <h2 class="h2 center reveal">Post-screening <em>Q&amp;A</em></h2>
       <div class="faq reveal" id="faq-list" style="margin-top:30px"></div>
-      <p class="center" style="margin:44px 0 16px;font-size:18px">Ready to watch? Get event drops and deadlines in your inbox.</p>
-      <form class="signup" data-signup="home" novalidate><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="email" name="email" placeholder="Email address" aria-label="Email address" required><button class="btn btn-gold" type="submit">Get started</button></form>
+      <p class="center" style="margin:44px 0 16px;font-size:18px">Get event drops and deadlines before anyone else.</p>
+      <form class="signup" data-signup="home" novalidate><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="email" name="email" placeholder="Email address" aria-label="Email address" required><button class="btn btn-gold" type="submit">Get on the list</button></form>
     </div>
   </section>
 </main>
