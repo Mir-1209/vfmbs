@@ -26,12 +26,12 @@
         <span class="brand-word">VFMBS<i>.</i></span>
         <span class="brand-sub">Vanderbilt Film &amp;<br>Media Business Society</span>
       </a>
-      <nav class="nav-links" aria-label="Main">${NAV.map(([k, h, l]) => `<a href="${h}" class="${k === page ? "active" : ""}" ${k === page ? 'aria-current="page"' : ""}>${l}</a>`).join("")}</nav>
+      <nav class="nav-links" aria-label="Main">${NAV.map(([k, h, l], i) => `<a href="${h}" class="${k === page ? "active" : ""}" ${k === page ? 'aria-current="page"' : ""} data-scramble><sup>${V.pad(i + 1)}</sup><span class="lbl">${l}</span></a>`).join("")}</nav>
       <div class="nav-right">
+        <span class="onair" aria-hidden="true"><i></i>On air</span>
         <button class="icon-btn" data-search aria-label="Search (press /)">${icons.search}</button>
-        <span class="kbd" aria-hidden="true">/</span>
         <a class="icon-btn" href="/portal" aria-label="My Studio: your tickets and applications" data-cursor="Studio">${icons.ticket}<span class="badge" data-badge></span></a>
-        <a class="btn btn-gold btn-sm btn-nav magnetic" href="/apply">Apply Now</a>
+        <a class="nav-ticket magnetic" href="/apply" data-cursor="Admit one"><span class="nt-a">Admit one</span><span class="nt-b">Apply</span></a>
         <button class="icon-btn nav-toggle" aria-label="Open menu" aria-expanded="false">${icons.menu}</button>
       </div>`;
     document.body.prepend(nav);
@@ -40,7 +40,7 @@
     mm.className = "mobile-menu";
     mm.setAttribute("aria-hidden", "true");
     const all = [["home", "/", "Home"], ...NAV, ["apply", "/apply", "Apply"], ["portal", "/portal", "My Studio"], ["contact", "/contact", "Contact"]];
-    mm.innerHTML = all.map(([k, h, l], i) => `<a class="big ${k === page ? "active" : ""}" href="${h}" style="--i:${i}"><small>${V.pad(i + 1)}</small>${l}</a>`).join("") +
+    mm.innerHTML = `<div class="mm-sprockets l" aria-hidden="true"></div><div class="mm-sprockets r" aria-hidden="true"></div><div class="mm-head mono">Reel 01 · Select a scene</div>` + all.map(([k, h, l], i) => `<a class="big ${k === page ? "active" : ""}" href="${h}" style="--i:${i}"><small>SC.${V.pad(i + 1)}</small>${l}</a>`).join("") +
       `<div class="mm-foot"><a class="btn btn-gold" href="/apply">Apply Now</a><a class="btn btn-outline" href="/events">RSVP to an event</a></div>`;
     nav.after(mm);
     const tog = $(".nav-toggle", nav);
@@ -74,7 +74,8 @@
     const bar = document.createElement("div");
     bar.className = "announce";
     const href = V.safeUrl(a.link);
-    bar.innerHTML = `<span class="live">LIVE</span><span class="txt">${esc(a.text)}</span>${href ? `<a href="${esc(href)}">${esc(a.label || "Learn more")} →</a>` : ""}<button aria-label="Dismiss announcement">${icons.close}</button>`;
+    const msg = `<span class="led-item"><b>●</b> ${esc(a.text)}${href ? ` <em>${esc(a.label || "Learn more")} ▸</em>` : ""}</span>`;
+    bar.innerHTML = `<span class="live">LIVE</span>${href ? `<a class="led" href="${esc(href)}">` : `<div class="led">`}<span class="led-track">${msg.repeat(6)}</span>${href ? "</a>" : "</div>"}<button aria-label="Dismiss announcement">${icons.close}</button>`;
     document.body.prepend(bar);
     document.body.classList.add("has-bar");
     $("button", bar).addEventListener("click", () => { V.LS.set(key, 1); bar.remove(); document.body.classList.remove("has-bar"); });
@@ -84,37 +85,80 @@
     const s = V.C.settings;
     const socials = [["instagram", icons.ig, "Instagram"], ["linkedin", icons.li, "LinkedIn"], ["tiktok", icons.tiktok, "TikTok"], ["youtube", icons.yt, "YouTube"]]
       .filter(([k]) => V.safeUrl(s[k])).map(([k, ic, l]) => `<a class="icon-btn" href="${esc(V.safeUrl(s[k]))}" target="_blank" rel="noopener noreferrer" aria-label="${l}">${ic}</a>`).join("");
+    const credit = (role, name, href) => `<div class="cr reveal"><span class="cr-role">${role}</span><span class="cr-dots" aria-hidden="true"></span>${href ? `<a class="cr-name" href="${href}" data-scramble><span class="lbl">${name}</span></a>` : `<span class="cr-name">${name}</span>`}</div>`;
     const f = document.createElement("footer");
     f.className = "footer";
     f.innerHTML = `
       <div class="film-strip" aria-hidden="true"></div>
-      <div class="container">
-        <div class="foot-cta">
-          <h2 class="reveal">Your first credit<br><em>starts here.</em></h2>
-          <div class="foot-news reveal reveal-d1">
-            <p>Get event drops, deadlines and the Journal in your inbox. No spam, just good cinema.</p>
-            <form class="signup" data-signup="footer" novalidate><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="email" name="email" placeholder="you@vanderbilt.edu" aria-label="Email address" required><button class="btn btn-primary" type="submit">Subscribe</button></form>
+      <section class="end-credits" data-scene="END CREDITS" aria-label="Site links">
+        <div class="container">
+          <p class="ec-kicker reveal">A ${esc(s.shortName || "VFMBS")} Production</p>
+          <h2 class="ec-title" data-split>The business behind the <em>screen</em></h2>
+          <div class="ec-grid">
+            <div class="ec-col">
+              ${credit("Now showing", "Events", "/events")}
+              ${credit("Limited series", "Workshops", "/workshops")}
+              ${credit("Starring", "The Team", "/team")}
+              ${credit("Written by", "The Journal", "/journal")}
+              ${credit("In association with", "Our Partners", "/partners")}
+              ${credit("Based on a true story", "About", "/about")}
+            </div>
+            <div class="ec-col">
+              ${credit("Casting by", "Apply", "/apply")}
+              ${credit("Box office", "My Studio", "/portal")}
+              ${credit("Craft services", "Contact", "/contact")}
+              ${credit("Legal clearance", "Privacy &amp; Terms", "/privacy")}
+              ${credit("Standards &amp; practices", "Code of Conduct", "/privacy#conduct")}
+              ${credit("Accessibility", "Statement", "/privacy#accessibility")}
+            </div>
           </div>
+          <div class="ec-block reveal">Filmed on location at ${esc(s.location || "Vanderbilt University, Nashville")} · Written in finance · Directed by curiosity · Financed by the Deal Desk · Distributed across Nashville · No popcorn was harmed in the making of this website · All majors welcome</div>
         </div>
-        <div class="footer-grid">
-          <div>
-            <a class="brand" href="/"><img src="/assets/brand/logo.svg" alt="" width="38" height="38"><span class="brand-word">VFMBS<i>.</i></span></a>
-            <p style="max-width:340px;margin:16px 0 0">${esc(s.tagline || "The business behind the screen.")} Finance, film, media and entertainment at Vanderbilt.</p>
-            <div class="socials">${socials}<a class="icon-btn" href="mailto:${esc(s.email)}" aria-label="Email">${icons.mail}</a></div>
-          </div>
-          <div><h4>Explore</h4><ul><li><a href="/events">Events</a></li><li><a href="/workshops">Workshops</a></li><li><a href="/journal">Journal</a></li><li><a href="/team">Team</a></li></ul></div>
-          <div><h4>Society</h4><ul><li><a href="/about">About</a></li><li><a href="/apply">Apply</a></li><li><a href="/partners">Partner with us</a></li><li><a href="/portal">My Studio</a></li></ul></div>
-          <div><h4>Contact</h4><ul><li><a href="/contact">Contact us</a></li><li><a href="mailto:${esc(s.email)}">${esc(s.email)}</a></li><li><a href="/partners#inquire">Sponsorships</a></li><li>${esc(s.location || "Nashville, TN")}</li></ul></div>
-          <div><h4>Legal</h4><ul><li><a href="/privacy">Privacy</a></li><li><a href="/privacy#terms">Terms</a></li><li><a href="/privacy#conduct">Code of Conduct</a></li><li><a href="/privacy#accessibility">Accessibility</a></li></ul></div>
+      </section>
+      <section class="the-end" aria-label="Mailing list">
+        <div class="iris" aria-hidden="true"></div>
+        <div class="container te-inner">
+          <p class="te-fin" aria-hidden="true">The End</p>
+          <p class="te-post mono">· Post-credits scene ·</p>
+          <h2 class="te-h">Stay for the <em>sequel.</em></h2>
+          <p class="te-sub">Event drops, deadlines and the Journal, straight to your inbox.</p>
+          <form class="signup ticket-signup" data-signup="footer" novalidate><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><span class="ts-admit" aria-hidden="true">Admit one</span><input type="email" name="email" placeholder="you@vanderbilt.edu" aria-label="Email address" required><button class="btn btn-gold" type="submit">Get on the list</button></form>
         </div>
-        <div class="footer-bottom">
-          <p>© ${new Date().getFullYear()} ${esc(s.orgName || "VFMBS")}. VFMBS is a student organization at Vanderbilt University. Content on this site does not necessarily represent the views of Vanderbilt University.</p>
-          <span>No popcorn was harmed in the making of this website. · <a href="/admin">Admin</a></span>
-        </div>
+      </section>
+      <div class="container footer-bottom">
+        <a class="brand" href="/"><img src="/assets/brand/logo.svg" alt="" width="32" height="32"><span class="brand-word">VFMBS<i>.</i></span></a>
+        <div class="socials">${socials}<a class="icon-btn" href="mailto:${esc(s.email)}" aria-label="Email">${icons.mail}</a></div>
+        <p>© ${new Date().getFullYear()} ${esc(s.orgName || "VFMBS")}. VFMBS is a student organization at Vanderbilt University; content does not necessarily represent the views of Vanderbilt University. · <a href="/admin">Admin</a></p>
       </div>
-      <div class="giant" aria-hidden="true">VFMBS.</div>`;
+      <div class="giant" aria-hidden="true"><span>VFMBS.</span></div>`;
     const main = $("main");
     (main ? main.after(f) : document.body.append(f));
+    V.fx?.scan(f);
+  }
+
+  /* Page heroes become title cards: slate, giant word, letterbox */
+  function heroes() {
+    $$(".page-hero").forEach((h) => {
+      const sc = h.querySelector(".scene-no");
+      const lines = sc ? sc.innerHTML.split(/<br\s*\/?>/i).map((x) => x.replace(/<[^>]+>/g, "").trim()) : [];
+      const crumb = (h.querySelector(".crumbs")?.textContent || "").split("/").pop().trim();
+      const n = (lines[0] || "").replace(/\D/g, "") || "01";
+      h.dataset.aspect = "2.00";
+      h.dataset.scene = `SC.${n} · ${lines[1] || crumb.toUpperCase()}`;
+      if (crumb) h.insertAdjacentHTML("afterbegin", `<div class="hero-word" aria-hidden="true" data-parallax="-0.25">${esc(crumb)}</div>`);
+      if (sc) {
+        const d = new Date();
+        sc.outerHTML = `<div class="slate" aria-hidden="true" data-tilt>
+          <div class="slate-top"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="slate-bar"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="slate-body">
+            <div class="w"><span>Prod.</span>VFMBS: ${esc(crumb || "Feature")}</div>
+            <div><span>Roll</span>A${n}</div><div><span>Scene</span>${n}</div><div><span>Take</span>1</div>
+            <div class="w"><span>Shot</span>${esc(lines[1] || "")}</div>
+            <div><span>Director</span>The Board</div><div><span>Camera</span>35mm</div><div><span>Date</span>${V.pad(d.getMonth() + 1)}·${V.pad(d.getDate())}·${String(d.getFullYear()).slice(2)}</div>
+          </div></div>`;
+      }
+    });
   }
 
   function updateBadge() {
@@ -763,6 +807,7 @@
       a.style.cssText += `;--bg:${C[0]};--ink:${C[1]};--acc:${C[2]}`;
       a.innerHTML = V.poster(pal, m, page);
     });
+    heroes();
     renderNav();
     searchApi = initSearch();
     initScroll();

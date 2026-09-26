@@ -76,6 +76,10 @@ MARQ = '<span>FINANCE <img src="/assets/brand/logo.svg" alt=""> <em>film</em> <i
 
 pages = {}
 
+def mq(a, b, c, d, dirn="left"):
+    one = f'<span>{a} <img src="/assets/brand/logo.svg" alt=""> <em>{b}</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">{c} ✦ {d} ✦</span>'
+    return f'  <section class="marquee-big" aria-hidden="true"><div class="mq" data-dir="{dirn}">{one}{one}</div></section>\n'
+
 pages["index.html"] = head("VFMBS · Vanderbilt Film & Media Business Society", "The business behind the screen. Vanderbilt's society for film finance, media strategy, streaming, music and sports business: events, workshops and industry treks.", "/", f'<script type="application/ld+json">{ORG_LD}</script>\n') + f'''
 <body data-page="home">
 <main id="main">
@@ -232,7 +236,7 @@ pages["events.html"] = head("Events · VFMBS", "Speaker series, screenings, indu
       <div id="ev-out"></div>
     </div>
   </section>
-  <section class="section pt0" id="newsletter"><div class="container narrow center"><p class="eyebrow center">Never miss a premiere</p><h2 class="h2">Get event drops <em>first.</em></h2><form class="signup" data-signup="events" novalidate><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="email" name="email" placeholder="you@vanderbilt.edu" aria-label="Email" required><button class="btn btn-gold" type="submit">Notify me</button></form></div></section>
+{mq('NOW SHOWING','live','PREMIERES','TREKS')}  <section class="section pt0" id="newsletter"><div class="container narrow center"><p class="eyebrow center">Never miss a premiere</p><h2 class="h2">Get event drops <em>first.</em></h2><form class="signup" data-signup="events" novalidate><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="email" name="email" placeholder="you@vanderbilt.edu" aria-label="Email" required><button class="btn btn-gold" type="submit">Notify me</button></form></div></section>
 </main>''') + scripts("events")
 
 pages["workshops.html"] = head("Workshops · VFMBS", "Limited-series workshops in entertainment M&A, box office analytics, pitching, the creator economy, music rights and sports media.", "/workshops") + fill(f'''
@@ -253,7 +257,7 @@ pages["workshops.html"] = head("Workshops · VFMBS", "Limited-series workshops i
       <div class="ws-grid" id="ws-out"></div>
     </div>
   </section>
-</main>''') + scripts("workshops")
+{mq('LIMITED SERIES','binge','EPISODES','FINALES')}</main>''') + scripts("workshops")
 
 pages["team.html"] = head("Team · VFMBS", "Meet the board, track leads and directors of the Vanderbilt Film & Media Business Society.", "/team") + fill(f'''
 <body data-page="team">
@@ -265,7 +269,7 @@ pages["team.html"] = head("Team · VFMBS", "Meet the board, track leads and dire
       <div id="team-out"></div>
     </div>
   </section>
-  <section class="section pt0">
+{mq('THE CAST','& crew','STARRING','YOU NEXT')}  <section class="section pt0">
     <div class="container narrow">
       <p class="eyebrow center">Full credits</p>
       <div class="credits-roll"><div class="roll" id="roll"></div></div>
@@ -284,7 +288,7 @@ pages["partners.html"] = head("Partners & Sponsorship · VFMBS", "Partner with t
       <div class="logo-wall" id="wall"></div>
     </div>
   </section>
-  <section class="section pt0">
+{mq('IN ASSOCIATION','with','STUDIOS','STREAMERS')}  <section class="section pt0">
     <div class="container">
       <p class="eyebrow">What we offer</p>
       <h2 class="h2" style="margin-bottom:36px">Why partner <em>with us.</em></h2>
@@ -332,7 +336,7 @@ pages["about.html"] = head("About · VFMBS", "Our mission, tracks and story. The
       </div>
     </div>
   </section>
-  <section class="pipeline" aria-label="From script to screen">
+{mq('THE BUSINESS','behind','THE SCREEN','SINCE DAY ONE')}  <section class="pipeline" aria-label="From script to screen">
     <div class="pipe-sticky">
       <div class="pipe-head"><div><p class="eyebrow">What you'll learn</p><h2 class="h2" style="margin:0">From script <em>to screen.</em></h2></div><p class="lede" style="margin:0;max-width:420px">The full life of a project, and the business decisions at every stage.</p></div>
       <div class="pipe-track" id="pipe-track"></div>
@@ -378,7 +382,7 @@ pages["apply.html"] = head("Apply · VFMBS", "Join the Vanderbilt Film & Media B
 <body data-page="apply">
 <main id="main">
 {hero("crimson", "clapper", "Apply", '<span id="apply-season">Casting call</span>', "Your first <em>credit</em><br>starts here.", "We recruit curious people from every major. No finance or film experience required. It takes about 20 minutes, and your draft auto-saves.", '<div class="countdown left" id="countdown"></div><div class="timeline" id="timeline"></div>', "SCENE 06<br>INT. CASTING OFFICE · DAY")}
-  <section class="section-tight"><div class="container" id="apply-host"></div></section>
+{mq('CASTING CALL','open','ALL MAJORS','NO EXPERIENCE NEEDED')}  <section class="section-tight"><div class="container" id="apply-host"></div></section>
 </main>''') + scripts("apply")
 
 pages["contact.html"] = head("Contact · VFMBS", "Get in touch with the Vanderbilt Film & Media Business Society: general questions, sponsorships, speaking and press.", "/contact") + fill(f'''
@@ -391,7 +395,7 @@ pages["contact.html"] = head("Contact · VFMBS", "Get in touch with the Vanderbi
       <div class="panel" id="contact-host"></div>
     </div>
   </section>
-</main>''') + scripts("contact")
+{mq('CALL SHEET','hello','SPONSORS','PRESS')}</main>''') + scripts("contact")
 
 pages["portal.html"] = head("My Studio · VFMBS", "Your tickets, applications, interview and saved list.", "/portal", '<meta name="robots" content="noindex">\n') + '''
 <body data-page="portal">

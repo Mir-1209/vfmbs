@@ -24,7 +24,7 @@
      SOUND (WebAudio, synthesized: no files)
      ===================================================================== */
   const Sound = (() => {
-    let ctx, master, proj, on = V.LS.get("sound", false);
+    let ctx, master, proj, on = V.LS.get("sound", true), unlocked = false;
     const init = () => {
       if (ctx) return ctx;
       try {
@@ -54,7 +54,10 @@
     const api = {
       get on() { return on; },
       set(v) { on = v; V.LS.set("sound", v); if (v) { init(); ctx?.resume(); if (document.body.dataset.projector) projector(true); } else projector(false); document.dispatchEvent(new CustomEvent("sound", { detail: v })); },
-      unlock() { if (on) { init(); ctx?.resume(); } },
+      unlock() {
+        if (unlocked || !on || !init()) return;
+        ctx.resume().then(() => { unlocked = true; if (document.body.dataset.projector && !document.hidden) projector(true); document.dispatchEvent(new CustomEvent("sound", { detail: true })); });
+      },
       tick() { if (!on || !init()) return; const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "square"; o.frequency.value = 2400; env(g, t, 0.002, 0.03, 0.03); o.connect(g).connect(master); o.start(t); o.stop(t + 0.05); },
       click() { if (!on || !init()) return; const t = ctx.currentTime, s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = noise(0.08); f.type = "highpass"; f.frequency.value = 2500; env(g, t, 0.001, 0.25, 0.06); s.connect(f).connect(g).connect(master); s.start(t); },
       whoosh() { if (!on || !init()) return; const t = ctx.currentTime, s = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = noise(1); f.type = "bandpass"; f.Q.value = 1.2; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(4000, t + 0.55); env(g, t, 0.25, 0.22, 0.4); s.connect(f).connect(g).connect(master); s.start(t); },
@@ -71,11 +74,11 @@
      ===================================================================== */
   const VERT = "attribute vec2 p;varying vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0.,1.);}";
   const NOISE = `
-    float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
+    float h(vec2 p){vec3 q=fract(vec3(p.xyx)*.1031);q+=dot(q,q.yzx+33.33);return fract((q.x+q.y)*q.z);}
     float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
     float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return v;}`;
   function gl(canvas, fs, opts = {}) {
-    const g = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: false, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false, powerPreference: opts.power || "default" });
+    const g = canvas.getContext("webgl", { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false, powerPreference: opts.power || "default" });
     if (!g) return null;
     const sh = (type, src) => { const s = g.createShader(type); g.shaderSource(s, src); g.compileShader(s); if (!g.getShaderParameter(s, g.COMPILE_STATUS)) { console.warn(g.getShaderInfoLog(s)); return null; } return s; };
     const v = sh(g.VERTEX_SHADER, VERT), f = sh(g.FRAGMENT_SHADER, "precision highp float;varying vec2 uv;" + NOISE + fs);
@@ -110,7 +113,7 @@
       c=over(vec4(0.,0.,0.,flick),c);
       float leak=smoothstep(.62,.95,fbm(vec2(p.x*1.3+t*.04,p.y*1.1-t*.025)+fr*.0));
       c=over(vec4(1.,.45,.12,leak*.10*amt),c);
-      float g=h(gl_FragCoord.xy+fr*17.13)-.5;
+      float g=h(gl_FragCoord.xy+mod(fr,97.)*17.13)-.5;
       c=over(vec4(vec3(step(0.,g)),abs(g)*.11*amt),c);
       float s=0.;
       for(int i=0;i<3;i++){float fi=float(i);float r=h(vec2(fr*.37,fi));if(r>.72){float x=h(vec2(fi*9.1,floor(fr/3.)));float w=.0006+.0012*h(vec2(fr,fi*3.));s+=smoothstep(w,0.,abs(p.x-x-.002*sin(p.y*40.+fr)))*(.35+.65*n(vec2(p.y*30.,fr)));}}
@@ -130,7 +133,7 @@
         c=over(vec4(.08,.03,.01,char*.9),c);
         c=over(vec4(hot,max(core,ring)),c);
       }
-      gl_FragColor=c;
+      gl_FragColor=vec4(c.rgb*c.a,c.a);
     }`;
   const Film = (() => {
     if (page === "admin") return null;
@@ -141,7 +144,8 @@
     const G = RM ? null : gl(cv, FILM_FS);
     if (!G) { cv.remove(); return null; }
     document.documentElement.classList.add("has-film");
-    const st = { burn: 0, bo: [0.5, 0.5], amt: 1, flick: 0, last: 0 };
+    const isSafari = /^((?!chrome|chromium|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+    const st = { burn: 0, bo: [0.5, 0.5], amt: isSafari ? 0.7 : 1, flick: 0, last: 0 };
     const t0 = performance.now();
     const frame = (now) => {
       requestAnimationFrame(frame);
@@ -264,41 +268,28 @@
     const el = document.createElement("div");
     el.className = "preshow";
     el.innerHTML = `
-      <div class="ps-gate">
-        <img src="/assets/brand/logo.svg" alt="" class="ps-logo">
-        <p class="ps-kicker">Vanderbilt Film &amp; Media Business Society presents</p>
-        <p class="ps-rule">Please silence your phones.<br>The feature is about to begin.</p>
-        <div class="ps-actions">
-          <button class="ps-btn" data-s="1"><span class="ps-dot"></span>Enter with sound</button>
-          <button class="ps-btn ghost" data-s="0">Enter silently</button>
-        </div>
-        <p class="ps-meta">RUNTIME ∞ · RATED TV-FIN · 2.39:1</p>
-      </div>
-      <div class="ps-leader" hidden><div class="ps-sweep"></div><div class="ps-ring"></div><div class="ps-ring r2"></div><b>8</b></div>
+      <div class="ps-leader"><div class="ps-sweep"></div><div class="ps-ring"></div><div class="ps-ring r2"></div><b>5</b></div>
+      <div class="ps-foot"><span><img src="/assets/brand/logo.svg" alt=""> VFMBS · Reel 01</span><span class="ps-snd">◉ Sound on</span><button class="ps-skip">Skip ▸</button></div>
       <div class="curtain-l"></div><div class="curtain-r"></div>`;
     document.body.append(el);
-    return new Promise((resolve) => {
-      $$(".ps-btn", el).forEach((b) => b.addEventListener("click", async () => {
-        Sound.set(b.dataset.s === "1");
-        Sound.click();
-        $(".ps-gate", el).classList.add("out");
-        await new Promise((r) => setTimeout(r, 500));
-        const L = $(".ps-leader", el), num = $("b", L), sw = $(".ps-sweep", L);
-        L.hidden = false;
-        Sound.projector(true);
-        for (const k of [5, 4, 3, 2]) {
-          num.textContent = k;
-          Sound.tick();
-          await tween(560, (p) => sw.style.setProperty("--p", p * 360 + "deg"));
-        }
-        L.classList.add("flash");
-        Sound.boom();
-        await new Promise((r) => setTimeout(r, 180));
-        L.remove();
-        el.classList.add("open");
-        resolve(true);
-        setTimeout(() => { el.remove(); document.body.classList.remove("locked", "preshow-on"); V.introPlaying = false; }, 2600);
-      }));
+    let skip = false;
+    $(".ps-skip", el).addEventListener("click", () => (skip = true));
+    return new Promise(async (resolve) => {
+      const L = $(".ps-leader", el), num = $("b", L), sw = $(".ps-sweep", L);
+      Sound.projector(true);
+      for (const k of [5, 4, 3, 2]) {
+        if (skip) break;
+        num.textContent = k;
+        Sound.tick();
+        await tween(520, (p) => sw.style.setProperty("--p", p * 360 + "deg"));
+      }
+      L.classList.add("flash");
+      Sound.boom();
+      await new Promise((r) => setTimeout(r, 180));
+      L.remove(); $(".ps-foot", el).remove();
+      el.classList.add("open");
+      resolve(true);
+      setTimeout(() => { el.remove(); document.body.classList.remove("locked", "preshow-on"); V.introPlaying = false; }, 2600);
     });
   }
   V.preshow = preshow();
@@ -391,7 +382,7 @@
   function split(el) {
     if (el.dataset.splitDone) return;
     el.dataset.splitDone = 1;
-    let i = 0;
+    let i = 0, chN = 0;
     const wrap = (node) => {
       const out = document.createDocumentFragment();
       if (node.nodeType === 3) {
@@ -399,7 +390,8 @@
           if (!w) return;
           if (/^\s+$/.test(w)) return out.append(document.createTextNode(" "));
           const o = document.createElement("span"), inner = document.createElement("span");
-          o.className = "split-line"; inner.style.setProperty("--i", i++); inner.textContent = w;
+          o.className = "split-line"; inner.style.setProperty("--i", i++);
+          [...w].forEach((ch) => { const c = document.createElement("span"); c.className = "ch"; c.style.setProperty("--c", chN++); c.textContent = ch; inner.append(c); });
           o.append(inner); out.append(o);
         });
       } else if (node.nodeName === "BR") out.append(node.cloneNode());
@@ -409,6 +401,39 @@
     const frag = document.createDocumentFragment();
     [...el.childNodes].forEach((c) => frag.append(wrap(c)));
     el.innerHTML = ""; el.append(frag);
+  }
+
+  /* =====================================================================
+     SCRAMBLE: labels decode like a teleprinter
+     ===================================================================== */
+  const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/<>";
+  function scramble(el, dur = 700) {
+    if (RM || el.children.length) return;
+    const final = el.dataset.final || (el.dataset.final = el.textContent);
+    const t0 = performance.now();
+    const step = (t) => {
+      const p = clamp((t - t0) / dur);
+      const n = Math.floor(p * final.length);
+      el.textContent = final.slice(0, n) + [...final.slice(n)].map((c) => (c === " " ? " " : GLYPHS[(Math.random() * GLYPHS.length) | 0])).join("");
+      if (p < 1) requestAnimationFrame(step); else el.textContent = final;
+    };
+    requestAnimationFrame(step);
+  }
+  V.scramble = scramble;
+  const scrIO = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { scrIO.unobserve(e.target); scramble(e.target); } }), { threshold: 0.6 });
+  document.addEventListener("mouseover", (e) => {
+    const a = e.target.closest?.("[data-scramble]");
+    if (a && !a.dataset.busy) { const lbl = a.querySelector(".lbl") || a; a.dataset.busy = 1; scramble(lbl, 420); setTimeout(() => delete a.dataset.busy, 450); }
+  });
+
+  /* =====================================================================
+     SLATE: the clapperboard that opens every page
+     ===================================================================== */
+  function slates(root = document) {
+    $$(".slate:not([data-clapped])", root).forEach((s) => {
+      s.dataset.clapped = 1;
+      setTimeout(() => { s.classList.add("clap"); Sound.click(); }, RM ? 0 : 900);
+    });
   }
 
   /* =====================================================================
@@ -455,10 +480,14 @@
     scenes = $$("[data-scene], [data-aspect]");
     sizePinned();
     marquees = $$(".marquee-big .mq").map((m) => ({ el: m, x: 0, dir: m.dataset.dir === "right" ? 1 : -1 }));
+    $$(".eyebrow, .crumbs, .scr, .cat, .ev-type, .track-no, .board-lbl", root).forEach((el) => { if (!el.children.length && !el.dataset.final) scrIO.observe(el); });
+    irises = $$(".iris");
+    slates(root);
     V.reveal?.(root);
     V.counters?.(root);
     onScroll();
   }
+  let irises = [];
   function sizePinned() {
     pipes.forEach((p) => {
       if (innerWidth <= 900 || RM) { p.el.style.height = ""; return; }
@@ -501,6 +530,11 @@
         s.cards.forEach((c, k) => { c.style.setProperty("--cp", clamp(f - k).toFixed(3)); c.classList.toggle("on", k === i); });
         if (i !== s.last && r.top < vh * 0.5 && r.bottom > vh * 0.5) { s.last = i; Sound.click(); }
       });
+      irises.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const p = clamp((vh - r.top) / (r.height + vh * 0.2));
+        el.style.setProperty("--ir", ease(clamp((p - 0.08) / 0.5)) * 115 + 5 + "vmax");
+      });
       let best = null;
       for (const el of scenes) { const r = el.getBoundingClientRect(); if (r.top <= vh * 0.5 && r.bottom >= vh * 0.5) best = el; }
       setAspect(best?.dataset.aspect || "0");
@@ -526,7 +560,7 @@
 
   addEventListener("scroll", onScroll, { passive: true });
   addEventListener("resize", () => { sizePinned(); aspectNow = null; onScroll(); });
-  document.addEventListener("pointerdown", () => Sound.unlock(), { once: true });
+  ["pointerdown", "keydown", "touchend"].forEach((ev) => document.addEventListener(ev, () => Sound.unlock(), { passive: true }));
   if (page !== "admin") document.addEventListener("mouseover", (e) => { if (e.target.closest?.(".btn, .nav-links a")) Sound.tick(); });
 
   V.fx = { scan, split, setAspect, tween, ease };
