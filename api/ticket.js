@@ -14,7 +14,7 @@ export default handler(async (req, res) => {
   const rec = eventId && parse(await cmd("HGET", `${P}rsvps:${eventId}`, code));
   if (!rec) throw new HttpError(404, "This ticket was cancelled or doesn't exist.");
   const content = await loadContent(req);
-  const ev = (content.events || []).find((e) => e.id === eventId) || { id: eventId, title: "VFMBS Event" };
+  const ev = (content.events || []).find((e) => e.id === eventId) || { id: eventId, title: "Greenlight Event" };
   const [first, ...rest] = rec.name.split(" ");
   send(res, 200, {
     ticket: { code, no: rec.no, waitlist: rec.waitlist, checkedIn: rec.checkedIn, name: `${first}${rest.length ? " " + rest.at(-1)[0] + "." : ""}` },

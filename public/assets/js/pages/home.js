@@ -10,7 +10,7 @@ V.ready.then(async (C) => {
   const theater = V.Theater($("#theater-gl"), $("#screen"));
   buildSeats();
   const cards = [
-    { k: "presents", html: `<div class="sc-presents"><img src="/assets/brand/logo.svg" alt=""><p>${esc(S.orgName || "Vanderbilt Film & Media Business Society")}</p><span>presents</span></div>` },
+    { k: "presents", html: `<div class="sc-presents"><img src="/assets/brand/logo.svg" alt=""><p>${esc(S.orgName || "Vanderbilt Greenlight")}</p><span>presents</span></div>` },
     { k: "title", html: `<div class="sc-title"><span class="sc-k">A ${esc(S.season || "")} production</span><h2>The Business<br><em>behind the</em> Screen</h2></div>` },
     ...(C.featured || []).map((f) => ({ k: "feat", href: V.safeUrl(f.cta?.href) || "/apply", html: `<div class="sc-feat"><div class="sc-poster">${V.poster(f.palette, f.motif, f.id)}</div><div class="sc-copy"><span class="sc-k">${esc(f.kicker)}</span><h2>${esc(f.title)}</h2><p>${esc(f.tagline)}</p><span class="sc-cta">${esc(f.cta?.label || "Learn more")} ▸</span></div></div>` })),
     { k: "fin", html: `<div class="sc-title"><span class="sc-k">Now casting · all majors</span><h2>Your first<br><em>credit</em> starts here</h2></div>` },
@@ -89,7 +89,7 @@ V.ready.then(async (C) => {
       <div class="frame-cap"><span class="frame-no">${V.pad(i + 1)}A</span><b>${esc(x.title)}</b><span>${sub}</span></div>
     </article>`;
   }).join("");
-  $("#reel-edge-t").textContent = $("#reel-edge-b").textContent = Array.from({ length: 40 }, (_, i) => `VFMBS 5219 ▸ ${V.pad(i * 4 + 12)}  ◆  `).join("");
+  $("#reel-edge-t").textContent = $("#reel-edge-b").textContent = Array.from({ length: 40 }, (_, i) => `GREENLIGHT 5219 ▸ ${V.pad(i * 4 + 12)}  ◆  `).join("");
   dragScroll($("#reel-viewport"));
 
   function dragScroll(vp) {

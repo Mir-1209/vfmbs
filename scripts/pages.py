@@ -14,7 +14,7 @@ def head(title, desc, path, extra=""):
 <meta name="theme-color" content="#070707">
 <link rel="canonical" href="{SITE}{path}">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="VFMBS">
+<meta property="og:site_name" content="Greenlight">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{SITE}{path}">
@@ -51,7 +51,7 @@ def hero(palette, motif, crumb, eyebrow, title, lede, extra="", scene=""):
     return f'''  <section class="page-hero">
     <div class="art" style="{{v}}" data-palette="{palette}"><div class="beam"></div><div class="glow"></div><div class="motif" data-motif="{motif}"></div></div>
     <div class="container">
-      <div class="crumbs"><a href="/">VFMBS</a> / {crumb}</div>
+      <div class="crumbs"><a href="/">Greenlight</a> / {crumb}</div>
       <p class="eyebrow">{eyebrow}</p>
       <h1 class="h-display" data-split>{title}</h1>
       <p class="lede reveal">{lede}</p>
@@ -66,7 +66,7 @@ def fill(html):
         html = html.replace(f'style="{{v}}" data-palette="{k}"', f'style="--a1:{a};--a2:{b};--a3:{c}" data-palette="{k}"')
     return html
 
-ORG_LD = json.dumps({"@context": "https://schema.org", "@type": "Organization", "name": "Vanderbilt Film & Media Business Society", "alternateName": "VFMBS", "url": SITE, "logo": SITE + "/assets/brand/logo.svg", "email": "vfmbs@vanderbilt.edu", "parentOrganization": {"@type": "CollegeOrUniversity", "name": "Vanderbilt University"}, "address": {"@type": "PostalAddress", "addressLocality": "Nashville", "addressRegion": "TN", "addressCountry": "US"}})
+ORG_LD = json.dumps({"@context": "https://schema.org", "@type": "Organization", "name": "Vanderbilt Greenlight", "alternateName": "Greenlight", "url": SITE, "logo": SITE + "/assets/brand/logo.svg", "email": "vfmbs@vanderbilt.edu", "parentOrganization": {"@type": "CollegeOrUniversity", "name": "Vanderbilt University"}, "address": {"@type": "PostalAddress", "addressLocality": "Nashville", "addressRegion": "TN", "addressCountry": "US"}})
 
 LAUREL = '<svg viewBox="0 0 40 70" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M35 68C12 55 4 30 14 4M14 14c-6-2-9 2-9 2s4 3 9 0M11 26c-6-1-9 3-9 3s5 3 9-1M10 38c-6 0-8 5-8 5s5 2 9-2M13 50c-5 1-7 6-7 6s5 1 8-3M19 60c-4 2-5 7-5 7s5 0 7-4"/></svg>'
 def laurel(a, b, c):
@@ -80,10 +80,10 @@ def mq(a, b, c, d, dirn="left"):
     one = f'<span>{a} <img src="/assets/brand/logo.svg" alt=""> <em>{b}</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">{c} ✦ {d} ✦</span>'
     return f'  <section class="marquee-big" aria-hidden="true"><div class="mq" data-dir="{dirn}">{one}{one}</div></section>\n'
 
-pages["index.html"] = head("VFMBS · Vanderbilt Film & Media Business Society", "The business behind the screen. Vanderbilt's society for film finance, media strategy, streaming, music and sports business: events, workshops and industry treks.", "/", f'<script type="application/ld+json">{ORG_LD}</script>\n') + f'''
+pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Media", "The business behind the screen. Vanderbilt's society for film finance, media strategy, streaming, music and sports business: events, workshops and industry treks.", "/", f'<script type="application/ld+json">{ORG_LD}</script>\n') + f'''
 <body data-page="home">
 <main id="main">
-  <h1 class="sr-only">Vanderbilt Film &amp; Media Business Society: the business behind the screen</h1>
+  <h1 class="sr-only">Vanderbilt Greenlight: the business behind the screen</h1>
 
   <!-- SC.01 THE THEATER -->
   <section class="theater" id="theater" data-scene="SC.01 · INT. THEATER · NIGHT">
@@ -106,7 +106,7 @@ pages["index.html"] = head("VFMBS · Vanderbilt Film & Media Business Society", 
   <section class="marquee-scene" data-scene="SC.02 · EXT. MARQUEE · NIGHT">
     <div class="marquee-sign">
       <div class="bulbs top"></div><div class="bulbs bottom"></div><div class="bulbs left"></div><div class="bulbs right"></div>
-      <div class="mq-crown"><img src="/assets/brand/logo.svg" alt=""><span>VFMBS</span><em>Picture House</em></div>
+      <div class="mq-crown"><img src="/assets/brand/logo.svg" alt=""><span>Greenlight</span><em>Picture House</em></div>
       <div class="mq-now">Now showing</div>
       <div class="mq-rows" id="marquee-rows"></div>
       <a class="mq-all" href="/events" data-cursor="All events">Full program ▸</a>
@@ -146,7 +146,7 @@ pages["index.html"] = head("VFMBS · Vanderbilt Film & Media Business Society", 
     <div class="pipe-sticky">
       <div class="pipe-head">
         <div><p class="eyebrow">Storyboard · From script to screen</p><h2 class="h2" style="margin:0">How a film <em>gets made</em><br>(and paid for).</h2></div>
-        <p class="lede" style="margin:0;max-width:420px">Five shots. Every stage of a film's life maps to a VFMBS track, workshop or trek. Keep scrolling to dolly through.</p>
+        <p class="lede" style="margin:0;max-width:420px">Five shots. Every stage of a film's life maps to a Greenlight track, workshop or trek. Keep scrolling to dolly through.</p>
       </div>
       <div class="pipe-track" id="pipe-track"></div>
       <div class="pipe-progress"><i></i></div>
@@ -167,7 +167,7 @@ pages["index.html"] = head("VFMBS · Vanderbilt Film & Media Business Society", 
       <p class="eyebrow">Four tracks · pick your role</p>
       <div class="starring-word" aria-hidden="true">Starring</div>
       <div class="billing rack" id="billing"></div>
-      <p class="billing-fine">A VFMBS production · Written by you · Financed by the Deal Desk · Distributed across Nashville · No experience required · All majors welcome · Filmed on location at Vanderbilt University</p>
+      <p class="billing-fine">A Greenlight production · Written by you · Financed by the Deal Desk · Distributed across Nashville · No experience required · All majors welcome · Filmed on location at Vanderbilt University</p>
     </div>
     <div class="bill-peek" id="bill-peek" aria-hidden="true"></div>
   </section>
@@ -196,7 +196,7 @@ pages["index.html"] = head("VFMBS · Vanderbilt Film & Media Business Society", 
       <div class="big-ticket" id="big-ticket" data-tilt>
         <div class="bt-main">
           <span class="bt-admit">Admit one · Casting call</span>
-          <b>VFMBS</b>
+          <b>GREENLIGHT</b>
           <span class="bt-sub">The business behind the screen · Season 2026 · All majors</span>
           <div class="bt-grid"><div><span>Row</span>Front</div><div><span>Seat</span>Yours</div><div><span>Price</span>$0</div></div>
         </div>
@@ -217,7 +217,7 @@ pages["index.html"] = head("VFMBS · Vanderbilt Film & Media Business Society", 
   </section>
 </main>''' + scripts("home")
 
-pages["events.html"] = head("Events · VFMBS", "Speaker series, screenings, industry treks and the Greenlight Summit. RSVP in one click and get your ticket.", "/events") + fill(f'''
+pages["events.html"] = head("Events · Greenlight", "Speaker series, screenings, industry treks and the Greenlight Summit. RSVP in one click and get your ticket.", "/events") + fill(f'''
 <body data-page="events">
 <main id="main">
 {hero("cobalt", "spotlight", "Events", "Fall 2026 season", "Now <em>showing.</em>", "Speaker series, screenings with the numbers on screen, industry treks and our flagship Greenlight Summit. RSVP in one click and your ticket lands in My Studio.", '<div id="next-up" style="margin-top:40px"></div>', "SCENE 02<br>INT. SARRATT CINEMA · NIGHT")}
@@ -239,7 +239,7 @@ pages["events.html"] = head("Events · VFMBS", "Speaker series, screenings, indu
 {mq('NOW SHOWING','live','PREMIERES','TREKS')}  <section class="section pt0" id="newsletter"><div class="container narrow center"><p class="eyebrow center">Never miss a premiere</p><h2 class="h2">Get event drops <em>first.</em></h2><form class="signup" data-signup="events" novalidate><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="email" name="email" placeholder="you@vanderbilt.edu" aria-label="Email" required><button class="btn btn-gold" type="submit">Notify me</button></form></div></section>
 </main>''') + scripts("events")
 
-pages["workshops.html"] = head("Workshops · VFMBS", "Limited-series workshops in entertainment M&A, box office analytics, pitching, the creator economy, music rights and sports media.", "/workshops") + fill(f'''
+pages["workshops.html"] = head("Workshops · Greenlight", "Limited-series workshops in entertainment M&A, box office analytics, pitching, the creator economy, music rights and sports media.", "/workshops") + fill(f'''
 <body data-page="workshops">
 <main id="main">
 {hero("gold", "chart", "Workshops", "Season 1 · Limited series", "Binge-worthy <em>skills.</em>", "Every workshop is a limited series: a few episodes, a real deliverable and a finale in front of judges. Open to all Vanderbilt students by application. Members get priority.", "", "SCENE 03<br>INT. THE DEAL ROOM · DAY")}
@@ -259,7 +259,7 @@ pages["workshops.html"] = head("Workshops · VFMBS", "Limited-series workshops i
   </section>
 {mq('LIMITED SERIES','binge','EPISODES','FINALES')}</main>''') + scripts("workshops")
 
-pages["team.html"] = head("Team · VFMBS", "Meet the board, track leads and directors of the Vanderbilt Film & Media Business Society.", "/team") + fill(f'''
+pages["team.html"] = head("Team · Greenlight", "Meet the board, track leads and directors of the Vanderbilt Greenlight.", "/team") + fill(f'''
 <body data-page="team">
 <main id="main">
 {hero("violet", "camera", "Team", "Cast &amp; crew", "Meet the <em>cast.</em>", "The students running the show: our executive board, track leads and directors. Click anyone for their story.", "", "SCENE 04<br>EXT. ALUMNI LAWN · GOLDEN HOUR")}
@@ -277,10 +277,10 @@ pages["team.html"] = head("Team · VFMBS", "Meet the board, track leads and dire
   </section>
 </main>''') + scripts("team")
 
-pages["partners.html"] = head("Partners & Sponsorship · VFMBS", "Partner with the Vanderbilt Film & Media Business Society: recruiting, speaker events, treks, case competitions and the Greenlight Summit.", "/partners") + fill(f'''
+pages["partners.html"] = head("Partners & Sponsorship · Greenlight", "Partner with the Vanderbilt Greenlight: recruiting, speaker events, treks, case competitions and the Greenlight Summit.", "/partners") + fill(f'''
 <body data-page="partners">
 <main id="main">
-{hero("gold", "handshake", "Partners", "For studios, streamers, agencies, banks &amp; funds", "The next generation <em>of dealmakers.</em>", "VFMBS connects the entertainment industry with Vanderbilt's most curious finance, film and media students. Here's how we work with partners.", '<div class="actions"><a class="btn btn-gold btn-lg magnetic" href="#inquire">Become a partner</a><a class="btn btn-ghost btn-lg" href="#tiers">See packages</a></div>', "SCENE 05<br>INT. BOARDROOM · DAY")}
+{hero("gold", "handshake", "Partners", "For studios, streamers, agencies, banks &amp; funds", "The next generation <em>of dealmakers.</em>", "Greenlight connects the entertainment industry with Vanderbilt's most curious finance, film and media students. Here's how we work with partners.", '<div class="actions"><a class="btn btn-gold btn-lg magnetic" href="#inquire">Become a partner</a><a class="btn btn-ghost btn-lg" href="#tiers">See packages</a></div>', "SCENE 05<br>INT. BOARDROOM · DAY")}
   <section class="section-tight"><div class="container"><div class="stats" id="reach"></div></div></section>
   <section class="section">
     <div class="container">
@@ -315,14 +315,14 @@ pages["partners.html"] = head("Partners & Sponsorship · VFMBS", "Partner with t
   </section>
 </main>''').replace('id="tiers-list"', 'id="tiers"').replace('<section class="section pt0" id="tiers">', '<section class="section pt0" id="packages">').replace('href="#tiers"', 'href="#packages"') + scripts("contact", "partners")
 
-pages["journal.html"] = head("The Reel · Journal · VFMBS", "Stories, deal breakdowns and dispatches from the business of entertainment, by VFMBS members.", "/journal") + '''
+pages["journal.html"] = head("The Reel · Journal · Greenlight", "Stories, deal breakdowns and dispatches from the business of entertainment, by Greenlight members.", "/journal") + '''
 <body data-page="journal">
 <main id="main"></main>''' + scripts("journal")
 
-pages["about.html"] = head("About · VFMBS", "Our mission, tracks and story. The Vanderbilt Film & Media Business Society studies the business behind the screen.", "/about") + fill(f'''
+pages["about.html"] = head("About · Greenlight", "Our mission, tracks and story. The Vanderbilt Greenlight studies the business behind the screen.", "/about") + fill(f'''
 <body data-page="about">
 <main id="main">
-{hero("violet", "film", "About", "Our story", "Where Wall Street<br>meets <em>the Walk of Fame.</em>", "VFMBS is Vanderbilt's home for students who love what's on screen and want to understand the money, strategy and dealmaking behind it.", "", "SCENE 01<br>EXT. VANDERBILT · DAWN")}
+{hero("violet", "film", "About", "Our story", "Where Wall Street<br>meets <em>the Walk of Fame.</em>", "Greenlight is Vanderbilt's home for students who love what's on screen and want to understand the money, strategy and dealmaking behind it.", "", "SCENE 01<br>EXT. VANDERBILT · DAWN")}
   <section class="section-tight"><div class="container"><div class="stats" id="stats"></div></div></section>
   <section class="section manifesto"><div class="container"><p class="eyebrow">Mission</p><p class="m-text">Entertainment runs on <em>finance.</em> Every franchise, every streaming deal and every hit song sits on a stack of contracts, models and bets. We exist to teach that stack, and to put our members <em>in the room where it happens.</em></p></div></section>
   <section class="section pt0">
@@ -366,7 +366,7 @@ pages["about.html"] = head("About · VFMBS", "Our mission, tracks and story. The
   </section>
   <section class="section pt0">
     <div class="container split" style="align-items:start">
-      <div class="reveal"><p class="eyebrow">Timeline</p><h2 class="h2">Previously <em>on</em> VFMBS…</h2><p class="lede">How we got here. Edit these milestones as the story grows.</p></div>
+      <div class="reveal"><p class="eyebrow">Timeline</p><h2 class="h2">Previously <em>on</em> Greenlight…</h2><p class="lede">How we got here. Edit these milestones as the story grows.</p></div>
       <div class="story reveal reveal-d1">
         <div><b>Pilot</b><p>A handful of students who couldn't choose between a finance club and a film club start their own.</p></div>
         <div><b>Season 1</b><p>First speaker series and the first Deal Room workshop. Standing room only.</p></div>
@@ -378,14 +378,14 @@ pages["about.html"] = head("About · VFMBS", "Our mission, tracks and story. The
   <section class="section pt0"><div class="container"><div class="cta-band reveal"><div class="art" style="--a1:#0c0418;--a2:#3b1466;--a3:#b884ff"><div class="beam"></div><div class="glow"></div></div><h2 class="h2">Ready for your <em>close-up?</em></h2><div class="actions" style="justify-content:center"><a class="btn btn-gold btn-lg magnetic" href="/apply">Apply now</a><a class="btn btn-ghost btn-lg" href="/team">Meet the team</a></div></div></div></section>
 </main>''') + scripts("about")
 
-pages["apply.html"] = head("Apply · VFMBS", "Join the Vanderbilt Film & Media Business Society. All majors welcome. No experience required.", "/apply") + fill(f'''
+pages["apply.html"] = head("Apply · Greenlight", "Join the Vanderbilt Greenlight. All majors welcome. No experience required.", "/apply") + fill(f'''
 <body data-page="apply">
 <main id="main">
 {hero("crimson", "clapper", "Apply", '<span id="apply-season">Casting call</span>', "Your first <em>credit</em><br>starts here.", "We recruit curious people from every major. No finance or film experience required. It takes about 20 minutes, and your draft auto-saves.", '<div class="countdown left" id="countdown"></div><div class="timeline" id="timeline"></div>', "SCENE 06<br>INT. CASTING OFFICE · DAY")}
 {mq('CASTING CALL','open','ALL MAJORS','NO EXPERIENCE NEEDED')}  <section class="section-tight"><div class="container" id="apply-host"></div></section>
 </main>''') + scripts("apply")
 
-pages["contact.html"] = head("Contact · VFMBS", "Get in touch with the Vanderbilt Film & Media Business Society: general questions, sponsorships, speaking and press.", "/contact") + fill(f'''
+pages["contact.html"] = head("Contact · Greenlight", "Get in touch with the Vanderbilt Greenlight: general questions, sponsorships, speaking and press.", "/contact") + fill(f'''
 <body data-page="contact">
 <main id="main">
 {hero("teal", "mic", "Contact", "Get in touch", "Let's <em>talk.</em>", "Questions about joining, a speaker idea, a partnership or a press inquiry: we'd love to hear from you.", "", "SCENE 07<br>INT. PRODUCTION OFFICE · NIGHT")}
@@ -397,15 +397,15 @@ pages["contact.html"] = head("Contact · VFMBS", "Get in touch with the Vanderbi
   </section>
 {mq('CALL SHEET','hello','SPONSORS','PRESS')}</main>''') + scripts("contact")
 
-pages["portal.html"] = head("My Studio · VFMBS", "Your tickets, applications, interview and saved list.", "/portal", '<meta name="robots" content="noindex">\n') + '''
+pages["portal.html"] = head("My Studio · Greenlight", "Your tickets, applications, interview and saved list.", "/portal", '<meta name="robots" content="noindex">\n') + '''
 <body data-page="portal">
 <main id="main"></main>''' + scripts("portal")
 
-pages["ticket.html"] = head("Your Ticket · VFMBS", "Your VFMBS event ticket.", "/ticket", '<meta name="robots" content="noindex">\n') + '''
+pages["ticket.html"] = head("Your Ticket · Greenlight", "Your Greenlight event ticket.", "/ticket", '<meta name="robots" content="noindex">\n') + '''
 <body data-page="ticket">
 <main id="main" class="ticket-page"><div class="inner" id="ticket-host"><p class="mono center">Loading your ticket…</p></div></main>''' + scripts("ticket")
 
-pages["404.html"] = head("Scene Missing · VFMBS", "This page ended up on the cutting room floor.", "/404", '<meta name="robots" content="noindex">\n') + '''
+pages["404.html"] = head("Scene Missing · Greenlight", "This page ended up on the cutting room floor.", "/404", '<meta name="robots" content="noindex">\n') + '''
 <body data-page="404">
 <main id="main" class="nf">
   <div class="burn" aria-hidden="true"></div>
@@ -419,7 +419,7 @@ pages["404.html"] = head("Scene Missing · VFMBS", "This page ended up on the cu
 </main>''' + scripts()
 
 LEGAL_DATE = "September 25, 2026"
-pages["privacy.html"] = head("Privacy, Terms & Code of Conduct · VFMBS", "How VFMBS handles your data, our site terms, community code of conduct and accessibility statement.", "/privacy") + fill(f'''
+pages["privacy.html"] = head("Privacy, Terms & Code of Conduct · Greenlight", "How Greenlight handles your data, our site terms, community code of conduct and accessibility statement.", "/privacy") + fill(f'''
 <body data-page="privacy">
 <main id="main">
 {hero("cream", "star", "Legal", "The fine print", "Privacy &amp; <em>policies.</em>", "Plain-language policies for our website, events and community. Last updated {LEGAL_DATE}.", "", "")}
@@ -430,17 +430,17 @@ pages["privacy.html"] = head("Privacy, Terms & Code of Conduct · VFMBS", "How V
       <h3>What we collect</h3>
       <ul><li><b>Event RSVPs:</b> name, email, class year, dietary needs, interests and optional questions.</li><li><b>Applications:</b> the information you enter in the membership or workshop application, including optional resume and LinkedIn links.</li><li><b>Messages &amp; newsletter:</b> your name, email, organization and message, or just your email for the newsletter.</li><li><b>On your device:</b> My Studio stores your tickets, drafts and saved items in your browser's local storage. We don't use advertising or tracking cookies.</li></ul>
       <h3>How we use it</h3>
-      <p>Only to run VFMBS: managing event capacity and check-in, reviewing applications, contacting you about events you signed up for, and sending the newsletter if you subscribed. We never sell your data. With your consent (e.g., the resume book), we may share application materials with partner organizations for recruiting.</p>
+      <p>Only to run Greenlight: managing event capacity and check-in, reviewing applications, contacting you about events you signed up for, and sending the newsletter if you subscribed. We never sell your data. With your consent (e.g., the resume book), we may share application materials with partner organizations for recruiting.</p>
       <h3>Who can see it</h3>
-      <p>Current VFMBS board members with admin access. Data is stored with our hosting and database providers (Vercel and Upstash) and, if enabled, our email provider.</p>
+      <p>Current Greenlight board members with admin access. Data is stored with our hosting and database providers (Vercel and Upstash) and, if enabled, our email provider.</p>
       <h3>Retention &amp; your rights</h3>
       <p>RSVP data is kept for the academic year; applications for one recruiting cycle. You can ask us to access, correct or delete your data at any time by emailing <a class="gold" href="mailto:vfmbs@vanderbilt.edu">vfmbs@vanderbilt.edu</a>. You can clear on-device data from My Studio.</p>
       <h2 id="terms">Terms of use</h2>
-      <p>This website is operated by students of the Vanderbilt Film &amp; Media Business Society. Content is provided for educational purposes and is not financial advice. The Greenlight simulator and industry ticker are illustrative. Tickets are free, non-transferable and may be cancelled if capacity or safety requires. Don't attempt to misuse the site, submit false information or interfere with its operation.</p>
-      <p>VFMBS is a student organization at Vanderbilt University. Content on this site does not necessarily represent the views of Vanderbilt University.</p>
+      <p>This website is operated by students of the Vanderbilt Greenlight. Content is provided for educational purposes and is not financial advice. The Greenlight simulator and industry ticker are illustrative. Tickets are free, non-transferable and may be cancelled if capacity or safety requires. Don't attempt to misuse the site, submit false information or interfere with its operation.</p>
+      <p>Greenlight is a student organization at Vanderbilt University. Content on this site does not necessarily represent the views of Vanderbilt University.</p>
       <h2 id="conduct">Code of conduct</h2>
-      <p>VFMBS is a community for everyone who is curious about the business of entertainment. At every event, trek, workshop and online space we expect members and guests to:</p>
-      <ul><li>Treat everyone with respect, regardless of background, identity, major or experience level.</li><li>Represent Vanderbilt and VFMBS professionally with speakers, partners and hosts.</li><li>Respect confidentiality: what's shared off the record at industry events stays there.</li><li>Follow all University policies, including those on alcohol, hazing and harassment.</li></ul>
+      <p>Greenlight is a community for everyone who is curious about the business of entertainment. At every event, trek, workshop and online space we expect members and guests to:</p>
+      <ul><li>Treat everyone with respect, regardless of background, identity, major or experience level.</li><li>Represent Vanderbilt and Greenlight professionally with speakers, partners and hosts.</li><li>Respect confidentiality: what's shared off the record at industry events stays there.</li><li>Follow all University policies, including those on alcohol, hazing and harassment.</li></ul>
       <p>Report concerns to any board member or at <a class="gold" href="mailto:vfmbs@vanderbilt.edu">vfmbs@vanderbilt.edu</a>. We'll handle reports promptly and confidentially.</p>
       <h2 id="accessibility">Accessibility</h2>
       <p>We want this site and our events to work for everyone. The site supports keyboard navigation, screen readers and reduced-motion settings. If something isn't accessible, or you need an event accommodation, email us and we'll make it right.</p>
@@ -453,7 +453,7 @@ for n, h in pages.items():
         f.write(h)
 print("wrote", len(pages), "pages")
 
-admin = head("Admin · VFMBS", "VFMBS control room.", "/admin", '<meta name="robots" content="noindex, nofollow">\n<link rel="stylesheet" href="/assets/css/admin.css">\n') + '''
+admin = head("Admin · Greenlight", "Greenlight control room.", "/admin", '<meta name="robots" content="noindex, nofollow">\n<link rel="stylesheet" href="/assets/css/admin.css">\n') + '''
 <body data-page="admin">
 <div id="admin"><div class="login"><p class="mono">Loading control room…</p></div></div>
 <noscript><p>The admin dashboard needs JavaScript.</p></noscript>

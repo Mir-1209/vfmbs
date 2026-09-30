@@ -1,5 +1,5 @@
 /* =========================================================================
-   VFMBS UI: chrome (nav, footer, search), modals, cards, RSVP/tickets,
+   Greenlight UI: chrome (nav, footer, search), modals, cards, RSVP/tickets,
    workshop applications, forms, toasts, popcorn.
    ========================================================================= */
 (() => {
@@ -21,10 +21,10 @@
     const nav = document.createElement("header");
     nav.className = "nav";
     nav.innerHTML = `
-      <a class="brand" href="/" aria-label="VFMBS home">
+      <a class="brand" href="/" aria-label="Vanderbilt Greenlight home">
         <img src="/assets/brand/logo.svg" alt="" width="38" height="38">
-        <span class="brand-word">VFMBS<i>.</i></span>
-        <span class="brand-sub">Vanderbilt Film &amp;<br>Media Business Society</span>
+        <span class="brand-word brand-stack"><span>Vanderbilt</span><span>Greenlight</span></span>
+        <span class="brand-sub">The Business of<br>Film &amp; Media</span>
       </a>
       <nav class="nav-links" aria-label="Main">${NAV.map(([k, h, l], i) => `<a href="${h}" class="${k === page ? "active" : ""}" ${k === page ? 'aria-current="page"' : ""} data-scramble><sup>${V.pad(i + 1)}</sup><span class="lbl">${l}</span></a>`).join("")}</nav>
       <div class="nav-right">
@@ -92,7 +92,7 @@
       <div class="film-strip" aria-hidden="true"></div>
       <section class="end-credits" data-scene="END CREDITS" aria-label="Site links">
         <div class="container">
-          <p class="ec-kicker reveal">A ${esc(s.shortName || "VFMBS")} Production</p>
+          <p class="ec-kicker reveal">A ${esc(s.shortName || "Greenlight")} Production</p>
           <h2 class="ec-title" data-split>The business behind the <em>screen</em></h2>
           <div class="ec-grid">
             <div class="ec-col">
@@ -126,11 +126,11 @@
         </div>
       </section>
       <div class="container footer-bottom">
-        <a class="brand" href="/"><img src="/assets/brand/logo.svg" alt="" width="32" height="32"><span class="brand-word">VFMBS<i>.</i></span></a>
+        <a class="brand" href="/"><img src="/assets/brand/logo.svg" alt="" width="32" height="32"><span class="brand-word brand-stack"><span>Vanderbilt</span><span>Greenlight</span></span></a>
         <div class="socials">${socials}<a class="icon-btn" href="mailto:${esc(s.email)}" aria-label="Email">${icons.mail}</a></div>
-        <p>© ${new Date().getFullYear()} ${esc(s.orgName || "VFMBS")}. VFMBS is a student organization at Vanderbilt University; content does not necessarily represent the views of Vanderbilt University. · <a href="/admin">Admin</a></p>
+        <p>© ${new Date().getFullYear()} ${esc(s.orgName || "Greenlight")}. Greenlight is a student organization at Vanderbilt University; content does not necessarily represent the views of Vanderbilt University. · <a href="/admin">Admin</a></p>
       </div>
-      <div class="giant" aria-hidden="true"><span>VFMBS.</span></div>`;
+      <div class="giant" aria-hidden="true"><span>GREENLIGHT.</span></div>`;
     const main = $("main");
     (main ? main.after(f) : document.body.append(f));
     V.fx?.scan(f);
@@ -152,7 +152,7 @@
           <div class="slate-top"><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <div class="slate-bar"><i></i><i></i><i></i><i></i><i></i><i></i></div>
           <div class="slate-body">
-            <div class="w"><span>Prod.</span>VFMBS: ${esc(crumb || "Feature")}</div>
+            <div class="w"><span>Prod.</span>Greenlight: ${esc(crumb || "Feature")}</div>
             <div><span>Roll</span>A${n}</div><div><span>Scene</span>${n}</div><div><span>Take</span>1</div>
             <div class="w"><span>Shot</span>${esc(lines[1] || "")}</div>
             <div><span>Director</span>The Board</div><div><span>Camera</span>35mm</div><div><span>Date</span>${V.pad(d.getMonth() + 1)}·${V.pad(d.getDate())}·${String(d.getFullYear()).slice(2)}</div>
@@ -562,9 +562,9 @@
     if (!ev) return;
     const z = (d) => new Date(d).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
     const clean = (s) => String(s || "").replace(/[\\,;]/g, (m) => "\\" + m).replace(/\n/g, "\\n");
-    const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//VFMBS//Events//EN", "CALSCALE:GREGORIAN", "BEGIN:VEVENT",
+    const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Greenlight//Events//EN", "CALSCALE:GREGORIAN", "BEGIN:VEVENT",
       `UID:${ev.id}@vfmbs`, `DTSTAMP:${z(Date.now())}`, `DTSTART:${z(ev.date)}`, `DTEND:${z(ev.end || ev.date)}`,
-      `SUMMARY:${clean(ev.title)} (VFMBS)`, `LOCATION:${clean(ev.location)}`, `DESCRIPTION:${clean(ev.desc)}`, `URL:${location.origin}/events#${ev.id}`, "END:VEVENT", "END:VCALENDAR"];
+      `SUMMARY:${clean(ev.title)} (Greenlight)`, `LOCATION:${clean(ev.location)}`, `DESCRIPTION:${clean(ev.desc)}`, `URL:${location.origin}/events#${ev.id}`, "END:VEVENT", "END:VCALENDAR"];
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([lines.join("\r\n")], { type: "text/calendar" }));
     a.download = ev.id + ".ics";

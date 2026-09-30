@@ -600,3 +600,11 @@ a.cr-name:hover { color: var(--gold); letter-spacing: 0.1em; }
 @media (max-width: 900px) { .ec-grid { grid-template-columns: 1fr; } .cr-role { white-space: normal; text-align: left; } .ticket-signup { flex-direction: row; } .ticket-signup .ts-admit { display: none; } }
 @media (max-width: 640px) { .ticket-signup { flex-direction: column; } .cr-name { font-size: 26px; } }
 @media (prefers-reduced-motion: reduce) { .split-line .ch { transform: none; filter: none; opacity: 1; } .reveal { filter: none; } .iris { display: none; } }
+
+/* ---------------- Vanderbilt Greenlight wordmark ---------------- */
+.brand-stack { display: grid; gap: 1px; font-family: var(--display); font-size: 15px; line-height: 0.95; letter-spacing: 0.2em; text-transform: uppercase; }
+.brand-stack span:last-child { color: #2fbf71; }
+.footer-bottom .brand-stack { font-size: 14px; }
+.footer .giant { font-size: 17vw; }
+.bt-main b { font-size: clamp(56px, 10vw, 130px); }
+.mq-crown span { font-size: 24px; }

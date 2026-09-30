@@ -9,7 +9,7 @@ V.ready.then((C) => {
   const main = $("#main");
 
   if (post) {
-    document.title = `${post.title} · The Reel · VFMBS`;
+    document.title = `${post.title} · The Reel · Greenlight`;
     const paras = String(post.body || "").split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
       .map((p) => p.startsWith("> ") ? `<blockquote>${esc(p.slice(2))}</blockquote>` : `<p>${esc(p).replace(/\n/g, "<br>")}</p>`).join("");
     const words = String(post.body || "").split(/\s+/).length;
@@ -20,7 +20,7 @@ V.ready.then((C) => {
           <div class="crumbs mono"><a href="/journal">The Reel</a> / ${esc(post.category)}</div>
           <h1 data-split>${esc(post.title)}</h1>
           <p class="dek">${esc(post.excerpt)}</p>
-          <div class="post-meta">${date(post.date)} · By ${esc(post.author || "VFMBS")} · ${Math.max(1, Math.round(words / 220))} min read</div>
+          <div class="post-meta">${date(post.date)} · By ${esc(post.author || "Greenlight")} · ${Math.max(1, Math.round(words / 220))} min read</div>
         </header>
         <div class="article-cover img-reveal">${V.art(post.palette, post.motif, { image: post.image, beam: true })}</div>
         <div class="article-body">${paras}</div>
@@ -37,7 +37,7 @@ V.ready.then((C) => {
     <header class="journal-mast container">
       <div class="mono">Stories, breakdowns &amp; dispatches from the business of entertainment</div>
       <h1 class="masthead" data-split>The Reel</h1>
-      <div class="issue-line"><span>${esc(S.issue || "")}</span><span>${esc(S.season || "")}</span><span>Vanderbilt Film &amp; Media Business Society</span></div>
+      <div class="issue-line"><span>${esc(S.issue || "")}</span><span>${esc(S.season || "")}</span><span>Vanderbilt Greenlight</span></div>
     </header>
     <section class="section-tight container">
       <div class="toolbar"><div class="filters" id="cats">${cats.map((c) => `<button class="filter ${c === "All" ? "on" : ""}">${esc(c)}</button>`).join("")}</div></div>

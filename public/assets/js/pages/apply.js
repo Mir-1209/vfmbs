@@ -42,7 +42,7 @@ V.ready.then(async (C) => {
     d.tracks = d.tracks || [];
     let step = Math.min(d.step || 0, 3);
     const Q = [
-      ["why", "Why VFMBS, and why now?", 1500, "What draws you to the business side of entertainment?"],
+      ["why", "Why Greenlight, and why now?", 1500, "What draws you to the business side of entertainment?"],
       ["pitch", "Greenlight it: pitch us one film, show, deal or company you'd bet on.", 1500, "What is it, who is it for, and why does it make money?"],
       ["news", "What's a recent entertainment or media business story you can't stop thinking about?", 1000, "A merger, a flop, a breakout hit, a strategy shift. Anything."],
     ];
@@ -164,7 +164,7 @@ V.ready.then(async (C) => {
       const o = collect();
       const rows = [["Name", o.name + (o.pref ? ` (${o.pref})` : "")], ["Email", o.email], ["Class / Major", `${o.year} · ${o.major}`],
         ["Tracks", d.tracks.map((t, i) => `${i + 1}. ${V.trackName(t)}`).join("\n")], ["Areas", (o.areas || []).join(", ")],
-        ["Why VFMBS", o.why], ["Your pitch", o.pitch], ["Story", o.news], ["Resume", o.resume], ["LinkedIn", o.linkedin]];
+        ["Why Greenlight", o.why], ["Your pitch", o.pitch], ["Story", o.news], ["Resume", o.resume], ["LinkedIn", o.linkedin]];
       $("#review").innerHTML = rows.map(([k, v]) => `<div class="review-item"><span>${k}</span><p>${esc(v || "—")}</p></div>`).join("");
     };
     $$(".step-link").forEach((b) => b.addEventListener("click", () => {

@@ -20,7 +20,7 @@ V.ready.then((C) => {
     </div>`).join("");
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-tier]");
-    if (b) setTimeout(() => { const m = $("#c-message"); if (m && !m.value) m.value = `Hi VFMBS team, we're interested in the ${b.dataset.tier} partnership.`; }, 50);
+    if (b) setTimeout(() => { const m = $("#c-message"); if (m && !m.value) m.value = `Hi Greenlight team, we're interested in the ${b.dataset.tier} partnership.`; }, 50);
   });
   const S = C.settings;
   $("#sponsor-email").innerHTML = `<a class="link-arrow" href="mailto:${esc(S.sponsorEmail || S.email)}">${esc(S.sponsorEmail || S.email)} ${icons.arrowUR}</a>`;

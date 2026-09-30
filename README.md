@@ -1,6 +1,6 @@
-# VFMBS · Vanderbilt Film & Media Business Society
+# Greenlight · Vanderbilt Greenlight
 
-The official website for VFMBS: a cinematic, streaming-inspired site with real event ticketing, applications, and a **no-code admin dashboard** for the board.
+The official website for Greenlight: a cinematic, streaming-inspired site with real event ticketing, applications, and a **no-code admin dashboard** for the board.
 
 - **Public site:** home, events (RSVP → QR ticket), workshops, team, journal ("The Reel"), partners & sponsorship, about, apply, contact, My Studio, privacy/terms/code of conduct, 404
 - **Admin dashboard** at `/admin`: edit every event, workshop, story, team member, partner, homepage section and setting, and manage RSVPs, door check-in (QR scanner), applications, workshop apps, inbox, subscribers, and version history. No coding needed.
@@ -38,7 +38,7 @@ That's it: RSVPs, applications and messages are now stored securely.
 ### Optional add-ons
 | Feature | How |
 |---|---|
-| **Confirmation emails** (tickets, applications) | Create a free [Resend](https://resend.com) account, verify your domain, then add `RESEND_API_KEY` and `EMAIL_FROM` (e.g. `VFMBS <hello@vfmbs.org>`) |
+| **Confirmation emails** (tickets, applications) | Create a free [Resend](https://resend.com) account, verify your domain, then add `RESEND_API_KEY` and `EMAIL_FROM` (e.g. `Greenlight <hello@vfmbs.org>`) |
 | **Email alerts for contact/sponsorship messages** | Add `NOTIFY_EMAIL` (requires Resend) |
 | **Upload images in the admin** | Vercel → **Storage → Blob** → connect to the project (adds `BLOB_READ_WRITE_TOKEN`) |
 | **Custom domain** | Vercel → **Settings → Domains**, then run `npm run set-domain -- https://your-domain.com`, commit and push. Also set `SITE_URL` so email links use it. |

@@ -1,5 +1,5 @@
 /* =========================================================================
-   VFMBS CINEMA ENGINE
+   Greenlight CINEMA ENGINE
    · FilmLayer   WebGL celluloid overlay (grain, scratches, dust, flicker,
                  light leaks) + film-burn transitions, 24fps like real film
    · Theater     WebGL projector beam, volumetric haze & dust for the hero
@@ -269,7 +269,7 @@
     el.className = "preshow";
     el.innerHTML = `
       <div class="ps-leader"><div class="ps-sweep"></div><div class="ps-ring"></div><div class="ps-ring r2"></div><b>5</b></div>
-      <div class="ps-foot"><span><img src="/assets/brand/logo.svg" alt=""> VFMBS · Reel 01</span><span class="ps-snd">◉ Sound on</span><button class="ps-skip">Skip ▸</button></div>
+      <div class="ps-foot"><span><img src="/assets/brand/logo.svg" alt=""> Greenlight · Reel 01</span><span class="ps-snd">◉ Sound on</span><button class="ps-skip">Skip ▸</button></div>
       <div class="curtain-l"></div><div class="curtain-r"></div>`;
     document.body.append(el);
     let skip = false;

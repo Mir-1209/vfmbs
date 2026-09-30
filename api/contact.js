@@ -28,7 +28,7 @@ export default handler(async (req, res) => {
     await sendEmail({
       to: process.env.NOTIFY_EMAIL,
       replyTo: msg.email,
-      subject: `[VFMBS ${msg.topic}] ${msg.name}${msg.org ? " · " + msg.org : ""}`,
+      subject: `[Greenlight ${msg.topic}] ${msg.name}${msg.org ? " · " + msg.org : ""}`,
       html: layout({ kicker: `New ${msg.topic} inquiry`, title: msg.name, body: `<p>${esc(msg.email)}${msg.org ? " · " + esc(msg.org) : ""}</p><p style="white-space:pre-wrap">${esc(msg.message)}</p>` }),
     });
   }

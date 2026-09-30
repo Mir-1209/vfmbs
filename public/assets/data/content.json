@@ -1,7 +1,7 @@
 {
  "settings": {
-  "orgName": "Vanderbilt Film & Media Business Society",
-  "shortName": "VFMBS",
+  "orgName": "Vanderbilt Greenlight",
+  "shortName": "Greenlight",
   "tagline": "The business behind the screen.",
   "season": "Fall 2026",
   "issue": "Vol. 04",
@@ -71,7 +71,7 @@
  "featured": [
   {
    "id": "f-casting",
-   "kicker": "A VFMBS ORIGINAL",
+   "kicker": "A GREENLIGHT ORIGINAL",
    "title": "Fall Casting Call",
    "tagline": "Applications are open. Your first credit starts here.",
    "desc": "Join the society where Wall Street meets the Walk of Fame. Analyst and associate roles across Deal Desk, Studio Strategy, Content Lab and Venture — no experience required, just obsession.",
@@ -843,7 +843,7 @@
  "posts": [
   {
    "id": "post-welcome",
-   "title": "Previously On: Why We Started VFMBS",
+   "title": "Previously On: Why We Started Greenlight",
    "category": "Letter from the Board",
    "date": "2026-09-01",
    "author": "The Board",
@@ -1004,7 +1004,7 @@
    "a": "Membership is free for first-years; returning members pay modest semester dues that fund treks and events. Financial aid is available, just ask."
   },
   {
-   "q": "How can my company partner with VFMBS?",
+   "q": "How can my company partner with Greenlight?",
    "a": "Visit our Partners page or email us. We work with studios, streamers, agencies, banks and funds on speaker events, treks, case competitions and recruiting."
   }
  ],
@@ -1046,7 +1046,7 @@
    "▲ 5.0%"
   ],
   [
-   "VFMBS APPLICANTS",
+   "GREENLIGHT APPLICANTS",
    "▲ 38.0%"
   ]
  ]

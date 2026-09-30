@@ -1,5 +1,5 @@
 /* =========================================================================
-   VFMBS core: content loading, API client, storage, formatting, icons, art.
+   Greenlight core: content loading, API client, storage, formatting, icons, art.
    Exposes window.V. Every page script waits on V.ready.
    ========================================================================= */
 (() => {
@@ -289,7 +289,7 @@
         <circle cx="8" cy="50" r="7" fill="${bg}"/><circle cx="104" cy="50" r="7" fill="${bg}"/>
         <line x1="76" y1="26" x2="76" y2="74" stroke="${bg}" stroke-width="1.4" stroke-dasharray="2.2 2.2"/>
         <text x="16" y="66" font-family="Bebas Neue, Impact, sans-serif" font-size="34" fill="${ink}">No ${no}</text>
-        <text x="16" y="36" font-family="JetBrains Mono, monospace" font-size="4.2" letter-spacing="1.2" fill="${ink}">ADMIT ONE · VFMBS</text></g>`;
+        <text x="16" y="36" font-family="JetBrains Mono, monospace" font-size="4.2" letter-spacing="1.2" fill="${ink}">ADMIT ONE · GREENLIGHT</text></g>`;
     },
     waves(r, [bg, ink, acc]) {
       let s = "";

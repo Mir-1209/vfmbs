@@ -1,5 +1,5 @@
 /* =========================================================================
-   VFMBS Admin: no-code control room.
+   Greenlight Admin: no-code control room.
    Content editing is schema-driven: add a field to SCHEMAS and it appears.
    ========================================================================= */
 (() => {
@@ -422,7 +422,7 @@
     root.innerHTML = `
       <div class="adm">
         <aside class="adm-side" id="side">
-          <div class="adm-brand"><img src="/assets/brand/logo.svg" alt=""><div><b>VFMBS</b><small>Control room</small></div></div>
+          <div class="adm-brand"><img src="/assets/brand/logo.svg" alt=""><div><b>GREENLIGHT</b><small>Control room</small></div></div>
           ${NAV.map(([g, items]) => `<div class="adm-group">${g}</div>` + items.map(([k, l, i]) => `<button class="adm-nav" data-go="${k}">${i}<span>${l}</span><span class="cnt" data-cnt="${k}" hidden></span></button>`).join("")).join("")}
           <div class="spacer"></div>
           <a class="adm-nav" href="/" target="_blank" rel="noopener">${ic.ext}<span>View site</span></a>
@@ -473,7 +473,7 @@
     S.view = TITLES[view] ? view : "dashboard";
     $$("[data-go]").forEach((b) => b.classList.toggle("on", b.dataset.go === S.view));
     $("#view-title").textContent = TITLES[S.view];
-    document.title = `${TITLES[S.view]} · VFMBS Admin`;
+    document.title = `${TITLES[S.view]} · Greenlight Admin`;
     const v = $("#view");
     v.innerHTML = "";
     scrollTo(0, 0);
@@ -623,7 +623,7 @@
     $("#impf").addEventListener("change", async (e) => {
       try {
         const c = JSON.parse(await e.target.files[0].text());
-        if (!c || typeof c !== "object" || !Array.isArray(c.events)) throw new Error("That doesn't look like a VFMBS content file.");
+        if (!c || typeof c !== "object" || !Array.isArray(c.events)) throw new Error("That doesn't look like a Greenlight content file.");
         if (!confirm("Replace the current draft with this file? You'll still need to publish.")) return;
         S.content = c; changed(); toast("Imported. Review and publish.");
       } catch (err) { fail(err); }
@@ -820,7 +820,7 @@
     $("#aq").addEventListener("input", (e) => { f.q = e.target.value.toLowerCase(); draw(); });
     $("#ast").addEventListener("change", (e) => { f.st = e.target.value; draw(); });
     $("#atr").addEventListener("change", (e) => { f.tr = e.target.value; draw(); });
-    $("#acsv").addEventListener("click", () => csv(apps, [["id", "ID"], ["name", "Name"], ["pref", "Preferred"], ["email", "Email"], ["phone", "Phone"], ["year", "Year"], ["major", "Major"], [(a) => (a.tracks || []).map(tn), "Tracks"], ["areas", "Areas"], ["finexp", "Finance exp."], ["heard", "Heard via"], ["status", "Status"], ["rating", "Rating"], [(a) => (a.interview ? new Date(a.interview).toLocaleString() : ""), "Interview"], ["why", "Why VFMBS"], ["pitch", "Pitch"], ["news", "Story"], ["resume", "Resume"], ["linkedin", "LinkedIn"], ["notes", "Notes"], [(a) => new Date(a.ts).toLocaleString(), "Submitted"]], "applications"));
+    $("#acsv").addEventListener("click", () => csv(apps, [["id", "ID"], ["name", "Name"], ["pref", "Preferred"], ["email", "Email"], ["phone", "Phone"], ["year", "Year"], ["major", "Major"], [(a) => (a.tracks || []).map(tn), "Tracks"], ["areas", "Areas"], ["finexp", "Finance exp."], ["heard", "Heard via"], ["status", "Status"], ["rating", "Rating"], [(a) => (a.interview ? new Date(a.interview).toLocaleString() : ""), "Interview"], ["why", "Why Greenlight"], ["pitch", "Pitch"], ["news", "Story"], ["resume", "Resume"], ["linkedin", "LinkedIn"], ["notes", "Notes"], [(a) => new Date(a.ts).toLocaleString(), "Submitted"]], "applications"));
     draw();
   }
   function openApp(a, redraw, onDelete) {
@@ -841,7 +841,7 @@
           <div class="qa"><span>Tracks</span><p>${esc((a.tracks || []).map((t, i) => `${i + 1}. ${tn(t)}`).join("\n"))}</p></div>
           <div class="qa"><span>Areas · Finance exp.</span><p>${esc((a.areas || []).join(", ") || "—")}\n${esc(a.finexp || "")}</p></div>
         </div>
-        <div class="qa"><span>Why VFMBS</span><p>${esc(a.why)}</p></div>
+        <div class="qa"><span>Why Greenlight</span><p>${esc(a.why)}</p></div>
         <div class="qa"><span>Pitch</span><p>${esc(a.pitch)}</p></div>
         <div class="qa"><span>Industry story</span><p>${esc(a.news)}</p></div>
         <div class="quick" style="margin-bottom:18px">${safe(a.resume) ? `<a class="btn btn-outline btn-sm" href="${esc(safe(a.resume))}" target="_blank" rel="noopener noreferrer">${ic.ext} Resume</a>` : ""}${safe(a.linkedin) ? `<a class="btn btn-outline btn-sm" href="${esc(safe(a.linkedin))}" target="_blank" rel="noopener noreferrer">${ic.ext} LinkedIn</a>` : ""}</div>
@@ -907,7 +907,7 @@
         <details class="box" style="margin:0" data-id="${esc(m.id)}" ${m.read ? "" : 'style="border-color:rgba(207,174,112,.5)"'}>
           <summary style="cursor:pointer;display:flex;gap:12px;align-items:center;list-style:none">${m.read ? "" : `<span class="pill gold">New</span>`}<span class="pill">${esc(m.topic)}</span><b>${esc(m.name)}</b><span class="muted">${esc(m.org || "")}</span><span class="grow" style="flex:1"></span><span class="help">${ago(m.ts)}</span></summary>
           <p style="white-space:pre-wrap;margin:16px 0">${esc(m.message)}</p>
-          <div class="quick"><a class="btn btn-gold btn-sm" href="mailto:${esc(m.email)}?subject=${encodeURIComponent("Re: your message to VFMBS")}">${ic.mail} Reply to ${esc(m.email)}</a><button class="btn btn-outline btn-sm" data-unread>Mark unread</button><button class="btn btn-outline btn-sm" data-del>${ic.trash} Delete</button></div>
+          <div class="quick"><a class="btn btn-gold btn-sm" href="mailto:${esc(m.email)}?subject=${encodeURIComponent("Re: your message to Greenlight")}">${ic.mail} Reply to ${esc(m.email)}</a><button class="btn btn-outline btn-sm" data-unread>Mark unread</button><button class="btn btn-outline btn-sm" data-del>${ic.trash} Delete</button></div>
         </details>`).join("")}</div>` : `<div class="empty-s">Inbox zero. Contact and sponsorship inquiries will appear here.</div>`;
       $$("details[data-id]", v).forEach((dEl) => {
         const m = msgs.find((x) => x.id === dEl.dataset.id);
@@ -944,7 +944,7 @@
     root.innerHTML = `
       <div class="login">${V.art("gold", "clapper", { beam: true })}
         <div class="login-card">
-          <img src="/assets/brand/logo.svg" alt="VFMBS">
+          <img src="/assets/brand/logo.svg" alt="Greenlight">
           <h1>Control room</h1>
           <p class="help" style="margin:0 0 22px;font-size:14px">Board members only. Manage events, applications, content and check-in.</p>
           ${ready ? `

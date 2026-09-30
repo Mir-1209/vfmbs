@@ -91,7 +91,7 @@ export default handler(async (req, res) => {
     tracks,
     areas: list(b.areas, "Areas", { max: 10, itemMax: 30 }),
     finexp: str(b.finexp, "Finance experience", { max: 40 }),
-    why: str(b.why, "Why VFMBS", { max: 1500, required: true }),
+    why: str(b.why, "Why Greenlight", { max: 1500, required: true }),
     pitch: str(b.pitch, "Pitch", { max: 1500, required: true }),
     news: str(b.news, "Industry story", { max: 1000, required: true }),
     resume: url(b.resume, "Resume link"),
@@ -110,7 +110,7 @@ export default handler(async (req, res) => {
 
   await sendEmail({
     to: app.email,
-    subject: "Application received: VFMBS",
+    subject: "Application received: Greenlight",
     html: layout({
       kicker: "Casting call · Application received",
       title: `That's a wrap, ${app.pref || app.name.split(" ")[0]}.`,

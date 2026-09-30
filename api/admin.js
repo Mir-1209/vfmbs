@@ -116,7 +116,7 @@ const POST = {
     const m = input.match(/[?&]t=([^&\s]+)/);
     if (m) input = decodeURIComponent(m[1]);
     let code = input.includes(".") ? verifyId("ticket", input) : input.toUpperCase().replace(/[^A-Z0-9]/g, "");
-    if (!code) throw new HttpError(400, "That QR code isn't a valid VFMBS ticket.");
+    if (!code) throw new HttpError(400, "That QR code isn't a valid Greenlight ticket.");
     const eventId = await cmd("GET", `${P}ticket:${code}`);
     if (!eventId) throw new HttpError(404, `No ticket found for ${code}.`);
     const rec = parse(await cmd("HGET", `${P}rsvps:${eventId}`, code));
