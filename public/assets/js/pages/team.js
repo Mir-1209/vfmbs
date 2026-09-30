@@ -13,7 +13,7 @@ V.ready.then((C) => {
     const ini = String(m.name || "").split(" ").map((w) => w[0]).join("").slice(0, 2);
     const photo = V.safeUrl(m.photo);
     return `<button class="cast-card spot reveal" style="${V.vars(t.palette)}" data-member="${esc(m.id)}" data-cursor="Bio">
-      ${V.art(t.palette, null, { image: photo })}${photo ? "" : `<div class="initials">${esc(ini)}</div>`}
+      ${V.art(t.palette, null, { image: photo, pos: m.imagePos, zoom: m.imageZoom, tone: m.imageTone })}${photo ? "" : `<div class="initials">${esc(ini)}</div>`}
       <div class="cast-info"><div class="r">${esc(m.role)}</div><div class="n">${esc(m.name)} <span class="y">${esc(m.year || "")}</span></div><div class="bio">${esc(m.bio || "")}</div></div>
     </button>`;
   };
@@ -35,7 +35,7 @@ V.ready.then((C) => {
     const t = track(m.track);
     const photo = V.safeUrl(m.photo);
     V.openModal(`
-      <div class="modal-hero" style="aspect-ratio:16/7">${V.art(t.palette, photo ? null : t.motif, { image: photo, beam: !photo })}
+      <div class="modal-hero" style="aspect-ratio:16/7">${V.art(t.palette, photo ? null : t.motif, { image: photo, beam: !photo, pos: m.imagePos, zoom: m.imageZoom, tone: m.imageTone })}
         <div class="modal-hero-content"><div class="kicker"><img src="/assets/brand/logo.svg" alt="">${esc(m.group || "Team")}</div><h2>${esc(m.name)}</h2></div></div>
       <div class="modal-body">
         <div class="meta-line"><span class="match">${esc(m.role)}</span>${m.year ? `<span>Class of ${esc(m.year)}</span>` : ""}${m.major ? `<span>${esc(m.major)}</span>` : ""}${m.track ? `<span class="rating">${esc(V.trackName(m.track).toUpperCase())}</span>` : ""}</div>

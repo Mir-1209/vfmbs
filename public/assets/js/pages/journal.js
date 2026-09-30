@@ -22,7 +22,7 @@ V.ready.then((C) => {
           <p class="dek">${esc(post.excerpt)}</p>
           <div class="post-meta">${date(post.date)} · By ${esc(post.author || "Greenlight")} · ${Math.max(1, Math.round(words / 220))} min read</div>
         </header>
-        <div class="article-cover img-reveal">${V.art(post.palette, post.motif, { image: post.image, beam: true })}</div>
+        <div class="article-cover img-reveal">${V.artFor(post, { beam: true })}</div>
         <div class="article-body">${paras}</div>
         <div class="article-foot"><a class="link-arrow" href="/journal">${icons.chevL} All stories</a><button class="btn btn-outline btn-sm" data-share="/journal?p=${encodeURIComponent(post.id)}">${icons.link} Copy link</button></div>
       </article>
@@ -49,7 +49,7 @@ V.ready.then((C) => {
     const [first, ...rest] = list;
     $("#posts").innerHTML = `
       <div class="mag" style="margin-bottom:50px">
-        <a class="mag-cover reveal" href="/journal?p=${encodeURIComponent(first.id)}" data-cursor="Read">${V.art(first.palette, first.motif, { image: first.image })}
+        <a class="mag-cover reveal" href="/journal?p=${encodeURIComponent(first.id)}" data-cursor="Read">${V.artFor(first)}
           <div class="masthead-row"><span class="cat">Cover story</span><span class="mono">${date(first.date)}</span></div>
           <div><div class="cat">${esc(first.category)}</div><h3>${esc(first.title)}</h3><p style="color:#cfcac1;margin:0;max-width:540px">${esc(first.excerpt)}</p></div>
         </a>

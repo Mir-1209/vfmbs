@@ -100,7 +100,7 @@ V.ready.then((C) => {
         <div class="dash-section">
           <h2>Workshop applications</h2>
           ${wsIds.length ? wsIds.map((id) => { const w = V.byId(id), a = ws[id]; return `
-            <div class="status-card"><div class="ev-thumb">${V.art(w.palette, w.motif, { image: w.image })}</div>
+            <div class="status-card"><div class="ev-thumb">${V.artFor(w)}</div>
               <div><h3>${esc(w.title)} <span class="status-pill st-review" data-ws-status="${id}" style="margin-left:6px">Under review</span></h3>
                 <p>Submitted ${new Date(a.ts).toLocaleDateString("en-US", { month: "short", day: "numeric" })} · <span style="font-family:var(--mono)">${esc(a.code)}</span></p>
                 <div class="progress-steps"><i class="on"></i><i class="on"></i><i></i></div></div>

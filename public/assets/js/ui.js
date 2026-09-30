@@ -217,7 +217,7 @@
     const inList = Store.list().includes(ev.id);
     return `
       <article class="card" data-open="${ev.id}" tabindex="0" aria-label="${esc(ev.title)}" data-cursor="View">
-        <div class="card-media">${V.art(ev.palette, ev.motif, { image: ev.image })}
+        <div class="card-media">${V.artFor(ev)}
           <span class="card-tag">${esc(ev.type)}</span>
           ${going ? `<span class="card-flag gold">GOING</span>` : left <= 10 && !V.isPast(ev) ? `<span class="card-flag">LAST<br>SEATS</span>` : ""}
           <div class="card-label">${esc(ev.title)}</div>
@@ -241,7 +241,7 @@
     const inList = Store.list().includes(ws.id);
     return `
       <article class="card" data-open="${ws.id}" tabindex="0" aria-label="${esc(ws.title)}" data-cursor="Episodes">
-        <div class="card-media">${V.art(ws.palette, ws.motif, { image: ws.image })}
+        <div class="card-media">${V.artFor(ws)}
           <span class="card-tag">${(ws.episodes || []).length} Episodes</span>
           ${applied ? `<span class="card-flag gold">APPLIED</span>` : (ws.demoApplied || 0) > ws.seats ? `<span class="card-flag">HOT</span>` : ""}
           <div class="card-label">${esc(ws.title)}</div>
@@ -262,7 +262,7 @@
     const inList = Store.list().includes(t.id);
     return `
       <article class="card" data-open="${t.id}" tabindex="0" aria-label="${esc(t.name)}" data-cursor="View">
-        <div class="card-media">${V.art(t.palette, t.motif)}<span class="card-tag">Track</span><div class="card-label">${esc(t.name)}</div></div>
+        <div class="card-media">${V.artFor(t)}<span class="card-tag">Track</span><div class="card-label">${esc(t.name)}</div></div>
         <div class="card-details">
           <div class="card-actions"><a class="round-btn filled" href="/apply" aria-label="Apply">${icons.play}</a><button class="round-btn ${inList ? "on" : ""}" data-list="${t.id}" aria-label="My List">${inList ? icons.check : icons.plus}</button><span class="spacer"></span><button class="round-btn" data-open="${t.id}" aria-label="More">${icons.chevDown}</button></div>
           <div class="card-meta"><span class="match">${V.match(t.id)}% Match</span></div>
@@ -273,7 +273,7 @@
   const anyCard = (x) => (x.episodes ? workshopCard(x) : x.skills ? trackCard(x) : x.body !== undefined ? postCard(x) : eventCard(x));
   function postCard(p) {
     return `<a class="post-card" href="/journal?p=${encodeURIComponent(p.id)}" data-cursor="Read">
-      <div class="thumb">${V.art(p.palette, p.motif, { image: p.image })}</div>
+      <div class="thumb">${V.artFor(p)}</div>
       <div class="cat">${esc(p.category)}</div><h3>${esc(p.title)}</h3><p>${esc(p.excerpt)}</p>
       <div class="post-meta">${p.date ? V.fmt(p.date + "T12:00:00Z", { month: "long", day: "numeric", year: "numeric" }, "UTC") : ""}${p.author ? " · " + esc(p.author) : ""}</div></a>`;
   }
@@ -312,7 +312,7 @@
     const left = V.seatsLeft(ev);
     const inList = Store.list().includes(ev.id);
     openModal(`
-      <div class="modal-hero">${V.art(ev.palette, ev.motif, { beam: true, image: ev.image })}
+      <div class="modal-hero">${V.artFor(ev, { beam: true })}
         <div class="modal-hero-content">
           <div class="kicker"><img src="/assets/brand/logo.svg" alt="">${esc(ev.type)}${ev.membersOnly ? " · Members only" : ""}</div>
           <h2>${esc(ev.title)}</h2>
@@ -347,7 +347,7 @@
     const closed = ws.open === false || new Date(ws.deadline) < new Date();
     const inList = Store.list().includes(ws.id);
     openModal(`
-      <div class="modal-hero">${V.art(ws.palette, ws.motif, { beam: true, image: ws.image })}
+      <div class="modal-hero">${V.artFor(ws, { beam: true })}
         <div class="modal-hero-content">
           <div class="kicker"><img src="/assets/brand/logo.svg" alt="">Workshop series</div>
           <h2>${esc(ws.title)}</h2>
@@ -373,7 +373,7 @@
         <div class="episodes">
           <div class="episodes-head"><h3>Episodes</h3><span class="chip">Season 1 · ${esc(V.C.settings.season || "")}</span></div>
           ${(ws.episodes || []).map((e, i) => `
-            <div class="episode"><div class="episode-n">${i + 1}</div><div class="episode-thumb">${V.art(ws.palette, ws.motif)}</div><div><h4>${esc(e.t)}</h4><p>${esc(e.s)}</p></div><div class="episode-d">${esc(e.d)}</div></div>`).join("")}
+            <div class="episode"><div class="episode-n">${i + 1}</div><div class="episode-thumb">${V.artFor(ws)}</div><div><h4>${esc(e.t)}</h4><p>${esc(e.s)}</p></div><div class="episode-d">${esc(e.d)}</div></div>`).join("")}
         </div>
       </div>`, { hash: ws.id });
   }
@@ -383,7 +383,7 @@
     if (!t) return;
     const ws = V.C.workshops.filter((w) => w.track === id);
     openModal(`
-      <div class="modal-hero">${V.art(t.palette, t.motif, { beam: true })}
+      <div class="modal-hero">${V.artFor(t, { beam: true })}
         <div class="modal-hero-content">
           <div class="kicker"><img src="/assets/brand/logo.svg" alt="">Track</div>
           <h2>${esc(t.name)}</h2>
@@ -394,7 +394,7 @@
         <div class="meta-line"><span class="match">${V.match(t.id)}% Match</span><span>${esc(t.genre)}</span></div>
         <p style="font-size:16px">${esc(t.blurb)}</p>
         <div class="chips" style="margin:16px 0 26px">${(t.skills || []).map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div>
-        ${ws.length ? `<h3 style="margin:0 0 12px">Related workshops</h3>${ws.map((w) => `<button class="status-card" style="grid-template-columns:120px 1fr" data-open="${w.id}"><div class="ev-thumb">${V.art(w.palette, w.motif, { image: w.image })}</div><div><h3>${esc(w.title)}</h3><p>${esc(w.subtitle)}</p></div></button>`).join("")}` : ""}
+        ${ws.length ? `<h3 style="margin:0 0 12px">Related workshops</h3>${ws.map((w) => `<button class="status-card" style="grid-template-columns:120px 1fr" data-open="${w.id}"><div class="ev-thumb">${V.artFor(w)}</div><div><h3>${esc(w.title)}</h3><p>${esc(w.subtitle)}</p></div></button>`).join("")}` : ""}
       </div>`);
   }
 
@@ -705,7 +705,7 @@
       const q = input.value.trim().toLowerCase();
       const hay = (o) => JSON.stringify(o).toLowerCase();
       const items = [...V.C.events.filter((e) => !V.isPast(e)), ...V.C.workshops, ...V.C.tracks, ...V.C.posts].filter((x) => !q || hay(x).includes(q) || (x.track && V.trackName(x.track).toLowerCase().includes(q)));
-      res.innerHTML = items.map((x) => x.body !== undefined ? `<article class="card" style="--w:auto" data-post="${x.id}"><a href="/journal?p=${encodeURIComponent(x.id)}" class="card-media" style="display:block">${V.art(x.palette, x.motif, { image: x.image })}<span class="card-tag">Journal</span><div class="card-label">${esc(x.title)}</div></a></article>` : anyCard(x)).join("");
+      res.innerHTML = items.map((x) => x.body !== undefined ? `<article class="card" style="--w:auto" data-post="${x.id}"><a href="/journal?p=${encodeURIComponent(x.id)}" class="card-media" style="display:block">${V.artFor(x)}<span class="card-tag">Journal</span><div class="card-label">${esc(x.title)}</div></a></article>` : anyCard(x)).join("");
       res.nextElementSibling?.classList.contains("search-empty") && res.nextElementSibling.remove();
       if (!items.length) res.insertAdjacentHTML("afterend", `<p class="search-empty">Your search for "${esc(q)}" did not have any matches. Try "finance", "trek" or "pitch".</p>`);
     };

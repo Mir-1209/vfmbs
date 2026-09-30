@@ -186,3 +186,38 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
   .item .thumb { display: none; }
   .slot-gen { grid-template-columns: 1fr 1fr; }
 }
+
+/* ---------------- Art director (poster & photo picker) ---------------- */
+.drawer { width: min(820px, 100%); }
+.drawer .preview { aspect-ratio: auto; display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 20px; overflow: visible; position: static; }
+.drawer .preview .pv:nth-child(3) { grid-column: 1 / -1; }
+.pv { position: relative; margin: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--line-2); background: #000; }
+.pv figcaption { position: absolute; z-index: 4; top: 8px; left: 8px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; background: rgba(0, 0, 0, 0.7); color: var(--cream); padding: 3px 7px; border-radius: 3px; }
+.pv .card-label { z-index: 4; font-size: 30px; }
+.preview.can-focus .pv { cursor: crosshair; }
+.preview.can-focus .pv::after { content: "Drag to set focus"; position: absolute; z-index: 4; right: 8px; bottom: 8px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; background: var(--gold); color: #111; padding: 3px 7px; border-radius: 3px; opacity: 0; transition: opacity 0.2s; }
+.preview.can-focus .pv:hover::after { opacity: 1; }
+.ad { border: 1px solid var(--line-2); border-radius: 14px; padding: 16px; background: #0c0c0d; }
+.ad-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.ad-head .label { font-size: 14px; }
+.ad-head .pill { margin-left: auto; }
+.ad-tabs { flex: 0 1 auto; }
+.ad-tabs button { padding: 8px 16px; }
+.ad-sub { font-size: 13px; font-weight: 700; margin: 18px 0 10px; display: flex; gap: 10px; align-items: baseline; }
+.ad-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.ad.compact .ad-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+.ad-tile { display: grid; gap: 7px; padding: 6px; border-radius: 12px; border: 2px solid transparent; background: #151517; text-align: left; transition: border-color 0.15s, transform 0.2s var(--ease), background 0.15s; }
+.ad-tile:hover { transform: translateY(-3px); background: #1c1c1f; }
+.ad-tile.on { border-color: var(--gold); background: rgba(207, 174, 112, 0.1); box-shadow: 0 0 0 3px rgba(207, 174, 112, 0.18); }
+.ad-art { position: relative; aspect-ratio: 4 / 3; border-radius: 8px; overflow: hidden; }
+.ad-art svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ad-tile span { font-size: 13px; font-weight: 600; padding: 0 4px 2px; }
+.ad-tile.on span::after { content: " ✓"; color: var(--gold); }
+.ad-note { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 13px; color: #ffc75a; background: rgba(255, 199, 90, 0.08); border: 1px solid rgba(255, 199, 90, 0.25); border-radius: 10px; padding: 10px 12px; }
+.ad-sliders { display: grid; gap: 12px; }
+.ad-sliders label { display: grid; grid-template-columns: 130px 1fr 60px; gap: 12px; align-items: center; font-size: 13px; color: #cfcac1; }
+.ad-sliders output { font-family: var(--mono); font-size: 12px; text-align: right; }
+.ad .seg button { padding: 10px 14px; font-size: 13px; }
+.ad .swatch { width: 44px; height: 44px; }
+@media (max-width: 700px) { .drawer .preview { grid-template-columns: 1fr; } .ad-grid { grid-template-columns: repeat(2, 1fr); } .ad-sliders label { grid-template-columns: 1fr; } }
+.drawer .preview.sq { grid-template-columns: 240px 180px; align-items: start; }

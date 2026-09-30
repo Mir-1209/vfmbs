@@ -23,7 +23,7 @@ V.ready.then((C) => {
     return `
       <article class="ev spot reveal ${past ? "past" : ""}" id="${ev.id}">
         <div class="ev-date"><div class="m">${V.fmt(ev.date, { month: "short" }, tz).toUpperCase()}</div><div class="d">${V.fmt(ev.date, { day: "numeric" }, tz)}</div><div class="w">${V.fmt(ev.date, { weekday: "long" }, tz)}</div></div>
-        <button class="ev-thumb in-list" data-open="${ev.id}" aria-label="Details for ${esc(ev.title)}" data-cursor="View">${V.art(ev.palette, ev.motif, { image: ev.image })}</button>
+        <button class="ev-thumb in-list" data-open="${ev.id}" aria-label="Details for ${esc(ev.title)}" data-cursor="View">${V.artFor(ev)}</button>
         <div>
           <div class="ev-type">${esc(ev.type)}${(ev.tags || []).map((t) => ` · ${esc(t)}`).join("")}</div>
           <h3>${esc(ev.title)}</h3>

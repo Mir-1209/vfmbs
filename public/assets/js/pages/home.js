@@ -12,7 +12,7 @@ V.ready.then(async (C) => {
   const cards = [
     { k: "presents", html: `<div class="sc-presents"><img src="/assets/brand/logo.svg" alt=""><p>${esc(S.orgName || "Vanderbilt Greenlight")}</p><span>presents</span></div>` },
     { k: "title", html: `<div class="sc-title"><span class="sc-k">A ${esc(S.season || "")} production</span><h2>The Business<br><em>behind the</em> Screen</h2></div>` },
-    ...(C.featured || []).map((f) => ({ k: "feat", href: V.safeUrl(f.cta?.href) || "/apply", html: `<div class="sc-feat"><div class="sc-poster">${V.poster(f.palette, f.motif, f.id)}</div><div class="sc-copy"><span class="sc-k">${esc(f.kicker)}</span><h2>${esc(f.title)}</h2><p>${esc(f.tagline)}</p><span class="sc-cta">${esc(f.cta?.label || "Learn more")} ▸</span></div></div>` })),
+    ...(C.featured || []).map((f) => ({ k: "feat", href: V.safeUrl(f.cta?.href) || "/apply", html: `<div class="sc-feat"><div class="sc-poster">${V.artFor(f)}</div><div class="sc-copy"><span class="sc-k">${esc(f.kicker)}</span><h2>${esc(f.title)}</h2><p>${esc(f.tagline)}</p><span class="sc-cta">${esc(f.cta?.label || "Learn more")} ▸</span></div></div>` })),
     { k: "fin", html: `<div class="sc-title"><span class="sc-k">Now casting · all majors</span><h2>Your first<br><em>credit</em> starts here</h2></div>` },
   ];
   const inner = $("#screen-inner");
@@ -85,7 +85,7 @@ V.ready.then(async (C) => {
     const going = x._k === "ev" && Store.tickets()[x.id];
     const sub = x._k === "ev" ? `${V.fmtDate(x)} · ${esc(x.location)}` : `${(x.episodes || []).length} episodes · ${esc(x.level)}`;
     return `<article class="frame" data-open="${x.id}" data-cursor="${x._k === "ev" ? "Screen it" : "Episodes"}" style="--i:${i}">
-      <div class="frame-img">${V.art(x.palette, x.motif, { image: x.image, seed: x.id })}${going ? `<span class="frame-badge">You're going</span>` : ""}</div>
+      <div class="frame-img">${V.artFor(x)}${going ? `<span class="frame-badge">You're going</span>` : ""}</div>
       <div class="frame-cap"><span class="frame-no">${V.pad(i + 1)}A</span><b>${esc(x.title)}</b><span>${sub}</span></div>
     </article>`;
   }).join("");
@@ -114,7 +114,7 @@ V.ready.then(async (C) => {
   $("#pipe-track").innerHTML = (C.pipeline || []).map((p, i) => `
     <article class="board" style="--rot:${((i % 3) - 1) * 0.8}deg">
       <div class="board-head"><span>SC. ${esc(p.n)}</span><span>SHOT ${shots[i % 5]}</span><span>${esc(p.title).toUpperCase()}</span></div>
-      <div class="board-frame">${V.poster(p.palette, p.motif, p.title)}<svg class="board-arrow" viewBox="0 0 100 40" aria-hidden="true"><path d="M5 30 Q50 ${i % 2 ? 2 : 38} 90 20" /><path d="M82 13 L91 20 L81 25"/></svg><span class="board-cam">${["PUSH IN", "PAN →", "DOLLY", "TILT ↑", "PULL OUT"][i % 5]}</span></div>
+      <div class="board-frame">${V.poster(p.palette, p.motif, p.artSeed ?? p.title)}<svg class="board-arrow" viewBox="0 0 100 40" aria-hidden="true"><path d="M5 30 Q50 ${i % 2 ? 2 : 38} 90 20" /><path d="M82 13 L91 20 L81 25"/></svg><span class="board-cam">${["PUSH IN", "PAN →", "DOLLY", "TILT ↑", "PULL OUT"][i % 5]}</span></div>
       <div class="board-notes"><h3>${esc(p.title)}</h3><div class="board-sub">${esc(p.sub)}</div><p>${esc(p.text)}</p></div>
     </article>`).join("");
 
@@ -147,7 +147,7 @@ V.ready.then(async (C) => {
   const peek = $("#bill-peek");
   $$("#billing .bill").forEach((b) => b.addEventListener("pointerenter", () => {
     const t = C.tracks[+b.dataset.i];
-    peek.innerHTML = `${V.art(t.palette, t.motif, { seed: t.id })}<div class="peek-cap"><span>${esc(t.genre)}</span><p>${esc(t.blurb)}</p></div>`;
+    peek.innerHTML = `${V.artFor(t)}<div class="peek-cap"><span>${esc(t.genre)}</span><p>${esc(t.blurb)}</p></div>`;
     peek.classList.add("on");
   }));
   $("#billing").addEventListener("pointerleave", () => peek.classList.remove("on"));
@@ -164,7 +164,7 @@ V.ready.then(async (C) => {
     <div class="tp-grid">
       <a class="tp-lead" href="/journal?p=${encodeURIComponent(posts[0].id)}" data-cursor="Read">
         <span class="tp-cat">${esc(posts[0].category)}</span><h3>${esc(posts[0].title)}</h3>
-        <div class="tp-photo">${V.art(posts[0].palette, posts[0].motif, { image: posts[0].image, seed: posts[0].id })}</div>
+        <div class="tp-photo">${V.artFor(posts[0])}</div>
         <p class="tp-dek">${esc(posts[0].excerpt)}</p><span class="tp-more">Continued on page 2 ▸</span>
       </a>
       <div class="tp-side">${posts.slice(1).map((p) => `<a class="tp-item" href="/journal?p=${encodeURIComponent(p.id)}" data-cursor="Read"><span class="tp-cat">${esc(p.category)}</span><h4>${esc(p.title)}</h4><p>${esc(p.excerpt)}</p></a>`).join("")}

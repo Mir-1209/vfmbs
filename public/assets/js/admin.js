@@ -37,7 +37,7 @@
   const clone = (o) => JSON.parse(JSON.stringify(o));
   const live = () => S.mode === "live";
   const api = (action, body) => V.api("admin?action=" + action, body);
-  const get = (o, p) => p.split(".").reduce((a, k) => (a == null ? a : a[k]), o);
+  const get = (o, p) => !p ? undefined : p.split(".").reduce((a, k) => (a == null ? a : a[k]), o);
   const set = (o, p, v) => { const ks = p.split("."); const last = ks.pop(); const t = ks.reduce((a, k) => (a[k] == null ? (a[k] = {}) : a[k]), o); t[last] = v; };
   const slug = (s) => String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 40) || "item";
   const uid = (prefix, title, list) => { let base = `${prefix}-${slug(title)}`, id = base, n = 2; while (list.some((x) => x.id === id)) id = `${base}-${n++}`; return id; };
@@ -76,7 +76,7 @@
      SCHEMAS
      ===================================================================== */
   const PALS = Object.keys(V.palettes), MOTIFS = Object.keys(V.motifs);
-  const posterFields = [{ k: "image", t: "image", label: "Photo / poster image (optional)", help: "Leave empty to use the generated poster art below." }, { k: "palette", t: "palette", label: "Poster colors" }, { k: "motif", t: "motif", label: "Poster icon" }];
+  const posterFields = [{ t: "poster", k: "image", label: "Artwork" }];
   const inWeek = (h = 18) => { const d = new Date(Date.now() + 7 * 864e5); return V.zonedToISO(`${d.toISOString().slice(0, 10)}T${V.pad(h)}:00`); };
 
   const SCHEMAS = {
@@ -136,7 +136,7 @@
         { row: [{ k: "group", t: "text", label: "Group", list: () => [...new Set(["Executive Board", "Track Leads", "Directors", "Advisors", "Alumni Council", ...S.content.team.map((m) => m.group)])] }, { k: "track", t: "select", label: "Track (sets card color)", opts: () => [["", "—"], ...S.content.tracks.map((t) => [t.id, t.name])] }] },
         { row: [{ k: "year", t: "text", label: "Class year", help: "e.g. '27" }, { k: "major", t: "text", label: "Major" }] },
         { k: "bio", t: "textarea", label: "Bio", rows: 4 },
-        { k: "photo", t: "image", label: "Headshot" },
+        { t: "photo", k: "photo", label: "Headshot" },
         { row: [{ k: "linkedin", t: "url", label: "LinkedIn URL" }, { k: "email", t: "text", label: "Email" }] },
         { k: "published", t: "toggle", label: "Visible on site" },
       ],
@@ -162,7 +162,7 @@
         { k: "genre", t: "text", label: "Tagline", help: "e.g. Finance · M&A · Valuation" },
         { k: "blurb", t: "textarea", label: "Description", rows: 3 },
         { k: "skills", t: "list", label: "Skills you'll learn", help: "One per line" },
-        { k: "palette", t: "palette", label: "Colors" }, { k: "motif", t: "motif", label: "Icon" },
+        { t: "poster", k: null, label: "Artwork" },
       ],
     },
   };
@@ -171,7 +171,7 @@
     { k: "featured", t: "objects", label: "Hero slides (billboard)", noun: "slide", blank: () => ({ id: "f-" + Date.now().toString(36), kicker: "NOW SHOWING", title: "New slide", tagline: "", desc: "", meta: [], rating: "", palette: "gold", motif: "film", image: "", cta: { label: "Learn more", href: "/events" }, info: "/about" }),
       fields: [{ row: [{ k: "kicker", t: "text", label: "Kicker" }, { k: "rating", t: "text", label: "Rating badge" }] }, { k: "title", t: "text", label: "Title" }, { k: "tagline", t: "text", label: "Tagline" }, { k: "desc", t: "textarea", label: "Description", rows: 2 }, { k: "meta", t: "tags", label: "Meta items", help: "Comma separated" }, { row: [{ k: "cta.label", t: "text", label: "Button text" }, { k: "cta.href", t: "text", label: "Button link", help: "/apply, /events#ev-id or https://…" }] }, { k: "info", t: "text", label: "More info link" }, ...posterFields] },
     { k: "stats", t: "objects", label: "Stats (numbers that count up)", noun: "stat", blank: () => ({ n: 10, suffix: "", label: "New stat" }), fields: [{ row: [{ k: "n", t: "number", label: "Number" }, { k: "suffix", t: "text", label: "Suffix" }, { k: "label", t: "text", label: "Label" }] }] },
-    { k: "pipeline", t: "objects", label: "“From script to screen” panels", noun: "panel", blank: () => ({ n: "06", title: "New stage", sub: "", text: "", motif: "film", palette: "gold" }), fields: [{ row: [{ k: "n", t: "text", label: "No." }, { k: "title", t: "text", label: "Title" }] }, { k: "sub", t: "text", label: "Subtitle" }, { k: "text", t: "textarea", label: "Text", rows: 2 }, { k: "palette", t: "palette", label: "Colors" }, { k: "motif", t: "motif", label: "Icon" }] },
+    { k: "pipeline", t: "objects", label: "“From script to screen” panels", noun: "panel", blank: () => ({ n: "06", title: "New stage", sub: "", text: "", motif: "film", palette: "gold" }), fields: [{ row: [{ k: "n", t: "text", label: "No." }, { k: "title", t: "text", label: "Title" }] }, { k: "sub", t: "text", label: "Subtitle" }, { k: "text", t: "textarea", label: "Text", rows: 2 }, { t: "poster", k: null, label: "Artwork", compact: true }] },
     { k: "top10", t: "list", label: "Top 10 reasons to join", help: "One per line (max 10 shown)" },
     { k: "reviews", t: "objects", label: "Member reviews", noun: "review", blank: () => ({ q: "", who: "Member", stars: 5 }), fields: [{ k: "q", t: "textarea", label: "Quote", rows: 2 }, { row: [{ k: "who", t: "text", label: "Attribution" }, { k: "stars", t: "number", label: "Stars (1–5)" }] }] },
     { k: "faq", t: "objects", label: "FAQ", noun: "question", blank: () => ({ q: "New question?", a: "" }), fields: [{ k: "q", t: "text", label: "Question" }, { k: "a", t: "textarea", label: "Answer", rows: 3 }] },
@@ -197,6 +197,12 @@
     ] },
     { legend: "Social links", fields: [{ row: [{ k: "instagram", t: "url", label: "Instagram" }, { k: "linkedin", t: "url", label: "LinkedIn" }] }, { row: [{ k: "tiktok", t: "url", label: "TikTok" }, { k: "youtube", t: "url", label: "YouTube" }] }] },
   ];
+
+
+  const POSTER_STYLES = [["chart", "Bars"], ["film", "Vortex"], ["camera", "Eye"], ["trophy", "Shards"], ["ticket", "Ticket"], ["music", "Waves"], ["spotlight", "Sunburst"], ["building", "Skyline"], ["palm", "Sunset"], ["clapper", "Cut-paper"]];
+  const PAL_NAMES = { gold: "Noir & Gold", crimson: "Bass Red", cobalt: "Midnight", emerald: "Forest", violet: "Velvet", ember: "Ember", mono: "Silver Screen", teal: "Lagoon", cream: "Paper" };
+  const TONE_OPTS = [["duotone", "Brand duotone"], ["mono", "Black & white"], ["original", "Original color"]];
+  const newSeed = () => Math.random().toString(36).slice(2, 8);
 
   /* =====================================================================
      FIELD RENDERER
@@ -269,6 +275,74 @@
           w.innerHTML = `<span class="label">${esc(f.label)}</span><div class="motifs">${MOTIFS.map((m) => `<button type="button" class="motif-btn ${val === m ? "on" : ""}" data-v="${m}" title="${m}" aria-label="${m}">${V.motifs[m]}</button>`).join("")}</div>`;
           $$(".motif-btn", w).forEach((b) => b.addEventListener("click", () => { $$(".motif-btn", w).forEach((x) => x.classList.toggle("on", x === b)); change(b.dataset.v); }));
           break;
+        case "poster": case "photo": {
+          // Art director: big visual pickers for generated posters + photo framing controls.
+          const imgKey = f.k;
+          const allowPoster = f.t === "poster";
+          const hasImg = () => Boolean(imgKey && V.safeUrl(obj[imgKey]));
+          const seed = () => obj.artSeed ?? obj.id ?? "";
+          const canUp = live() && S.health.uploads;
+          const set2 = (patch) => { Object.assign(obj, patch); onChange(f.k || "palette"); draw(); };
+          let tab = hasImg() || !allowPoster ? "photo" : "poster";
+          w.className = "field ad" + (f.compact ? " compact" : "");
+          const draw = () => {
+            const pal = obj.palette || "gold", mo = obj.motif || "film", lay = V.posterLayout(mo);
+            const pos = obj.imagePos || { x: 50, y: 50 }, zoom = obj.imageZoom || 1, tone = obj.imageTone || "duotone";
+            w.innerHTML = `
+              <div class="ad-head"><span class="label">${esc(f.label)}</span>
+                ${allowPoster && imgKey ? `<div class="seg ad-tabs"><button type="button" data-tab="poster" class="${tab === "poster" ? "on" : ""}">Generated poster</button><button type="button" data-tab="photo" class="${tab === "photo" ? "on" : ""}">Photo</button></div>` : ""}
+                <span class="pill ${hasImg() ? "gold" : "ok"}">Showing: ${hasImg() ? "photo" : "poster"}</span></div>
+              ${tab === "poster" && allowPoster ? `
+                ${hasImg() ? `<div class="ad-note">A photo is set, so the site shows the photo. <button type="button" class="btn btn-outline btn-sm" data-act="dropimg">Use poster instead</button></div>` : ""}
+                <div class="ad-sub">Style <span class="help">Click a poster</span></div>
+                <div class="ad-grid">${POSTER_STYLES.map(([m, n]) => `<button type="button" class="ad-tile ${V.posterLayout(m) === lay ? "on" : ""}" data-motif="${m}"><div class="ad-art">${V.poster(pal, m, seed())}</div><span>${n}</span></button>`).join("")}</div>
+                <div class="ad-sub">Colors</div>
+                <div class="ad-grid">${PALS.map((p) => `<button type="button" class="ad-tile ${p === pal ? "on" : ""}" data-pal="${p}"><div class="ad-art">${V.poster(p, mo, seed())}</div><span>${PAL_NAMES[p] || p}</span></button>`).join("")}</div>
+                <div class="actions" style="margin-top:12px"><button type="button" class="btn btn-gold btn-sm" data-act="shuffle">🎲 New variation</button><button type="button" class="btn btn-outline btn-sm" data-act="reseed">↺ Original layout</button></div>
+              ` : `
+                <div class="img-field"><input class="input" type="url" value="${esc(obj[imgKey] || "")}" placeholder="Paste an image link (https://…)"><button type="button" class="btn btn-outline btn-sm" data-act="upload">${ic.upload} Upload</button></div>
+                ${canUp ? "" : `<div class="help">Paste an image link, or connect Vercel Blob to upload files directly.</div>`}
+                <input type="file" accept="image/*" hidden>
+                ${hasImg() ? `
+                  <div class="ad-sub">Framing <span class="help">Drag on any preview above to set the focus point</span></div>
+                  <div class="ad-sliders">
+                    <label>Left ↔ Right<input type="range" min="0" max="100" value="${pos.x}" data-sl="x"><output>${Math.round(pos.x)}%</output></label>
+                    <label>Top ↕ Bottom<input type="range" min="0" max="100" value="${pos.y}" data-sl="y"><output>${Math.round(pos.y)}%</output></label>
+                    <label>Zoom<input type="range" min="1" max="3" step="0.05" value="${zoom}" data-sl="z"><output>${Number(zoom).toFixed(2)}×</output></label>
+                  </div>
+                  <div class="ad-sub">Color treatment</div>
+                  <div class="seg">${TONE_OPTS.map(([k, n]) => `<button type="button" data-tone="${k}" class="${tone === k ? "on" : ""}">${n}</button>`).join("")}</div>
+                  ${tone === "duotone" ? `<div class="ad-sub">Duotone color</div><div class="swatches">${PALS.map((p) => `<button type="button" class="swatch ${p === pal ? "on" : ""}" style="${V.vars(p)}" data-pal="${p}" title="${PAL_NAMES[p] || p}" aria-label="${PAL_NAMES[p] || p}"></button>`).join("")}</div>` : ""}
+                  <div class="actions" style="margin-top:12px"><button type="button" class="btn btn-outline btn-sm" data-act="resetframe">↺ Reset framing</button><button type="button" class="btn btn-outline btn-sm" data-act="dropimg">${ic.trash} Remove photo</button></div>
+                ` : `<p class="help" style="margin-top:10px">${allowPoster ? "No photo yet. The generated poster is used." : "No photo yet."}</p>`}
+              `}`;
+            $$("[data-tab]", w).forEach((b) => b.addEventListener("click", () => { tab = b.dataset.tab; draw(); }));
+            $$("[data-motif]", w).forEach((b) => b.addEventListener("click", () => set2({ motif: b.dataset.motif })));
+            $$("[data-pal]", w).forEach((b) => b.addEventListener("click", () => set2({ palette: b.dataset.pal })));
+            $$("[data-tone]", w).forEach((b) => b.addEventListener("click", () => set2({ imageTone: b.dataset.tone })));
+            $("[data-act=shuffle]", w)?.addEventListener("click", () => set2({ artSeed: newSeed() }));
+            $("[data-act=reseed]", w)?.addEventListener("click", () => { delete obj.artSeed; set2({}); });
+            $("[data-act=resetframe]", w)?.addEventListener("click", () => { delete obj.imagePos; delete obj.imageZoom; set2({}); });
+            $$("[data-act=dropimg]", w).forEach((b) => b.addEventListener("click", () => { obj[imgKey] = ""; tab = allowPoster ? "poster" : "photo"; set2({}); }));
+            $$("[data-sl]", w).forEach((r) => r.addEventListener("input", () => {
+              const k = r.dataset.sl, v = Number(r.value);
+              if (k === "z") obj.imageZoom = v; else obj.imagePos = { ...(obj.imagePos || { x: 50, y: 50 }), [k]: v };
+              r.nextElementSibling.textContent = k === "z" ? v.toFixed(2) + "×" : Math.round(v) + "%";
+              onChange(f.k);
+            }));
+            const inp = $("input[type=url]", w), file = $("input[type=file]", w);
+            inp?.addEventListener("change", (e) => { obj[imgKey] = e.target.value.trim(); set2({}); });
+            $("[data-act=upload]", w)?.addEventListener("click", () => canUp ? file.click() : toast("Uploads need Vercel Blob. For now, paste an image link.", "error"));
+            file?.addEventListener("change", async () => {
+              const fl = file.files[0]; if (!fl) return;
+              const btn = $("[data-act=upload]", w); btn.classList.add("loading");
+              try { obj[imgKey] = await uploadImage(fl); toast("Image uploaded"); set2({}); } catch (e) { fail(e); btn.classList.remove("loading"); }
+            });
+          };
+          ctx.redrawPoster = draw;
+          draw();
+          break;
+        }
         case "image": {
           const canUp = live() && S.health.uploads;
           w.innerHTML = `${label}<div class="img-field"><input class="input" id="${id}" type="url" value="${esc(val || "")}" placeholder="https://…"><button type="button" class="btn btn-outline btn-sm" ${canUp ? "" : 'title="Connect Vercel Blob to enable uploads"'}>${ic.upload} Upload</button></div><div class="img-prev" ${val ? "" : "hidden"}></div>${help || ""}${canUp ? "" : `<div class="help">Paste an image link, or connect Vercel Blob to upload files directly.</div>`}<input type="file" accept="image/*" hidden>`;
@@ -507,7 +581,7 @@
         const img = x.image || x.photo || x.logo;
         return `<div class="item ${hidden ? "hidden-item" : ""}" data-i="${i}">
           <div class="grip"><button data-a="up" aria-label="Move up">${ic.up}</button><button data-a="down" aria-label="Move down">${ic.down}</button></div>
-          <div class="thumb ${sc.square ? "sq" : ""}">${V.art(x.palette || "gold", sc.square ? null : x.motif, { image: img })}</div>
+          <div class="thumb ${sc.square ? "sq" : ""}">${sc.square ? V.art(x.palette || "gold", null, { image: img, pos: x.imagePos, zoom: x.imageZoom, tone: x.imageTone }) : V.artFor(x)}</div>
           <div style="min-width:0;cursor:pointer" data-a="edit"><h3>${esc(sc.label(x))}</h3><p>${esc(sc.sub(x))}</p></div>
           <div class="acts">${hidden ? `<span class="pill">Hidden</span>` : ""}${b ? `<span class="pill ${b[1]}">${esc(b[0])}</span>` : ""}
             ${"published" in x || key !== "tracks" ? `<button class="ib" data-a="vis" aria-label="${hidden ? "Show" : "Hide"}" title="${hidden ? "Show on site" : "Hide from site"}">${hidden ? ic.eyeOff : ic.eye}</button>` : ""}
@@ -547,20 +621,36 @@
   function editItem(key, x, redraw, isNew) {
     const sc = SCHEMAS[key];
     const d = $("#drawer");
+    const FORMATS = sc.square ? [["Card", "3 / 4"], ["Square", "1 / 1"]] : [["Card", "16 / 9"], ["Poster", "3 / 4"], ["Banner", "21 / 9"]];
+    const artOf = () => (key === "partners" ? V.art(x.palette || "gold", null, { image: x.logo, tone: "original" }) : key === "team" ? V.art((S.content.tracks.find((t) => t.id === x.track) || {}).palette || "gold", null, { image: x.photo, pos: x.imagePos, zoom: x.imageZoom, tone: x.imageTone }) : V.artFor(x));
     const preview = () => {
       const p = $(".preview", d);
       if (!p) return;
-      const img = x.image || x.photo || x.logo;
-      p.innerHTML = V.art(x.palette || "gold", sc.square ? null : x.motif, { image: img, beam: true }) + `<div class="card-label">${esc(sc.label(x))}</div>`;
+      p.innerHTML = FORMATS.map(([n, ar]) => `<figure class="pv" style="aspect-ratio:${ar}">${artOf()}<figcaption>${n}</figcaption>${n === FORMATS[0][0] ? `<div class="card-label">${esc(sc.label(x))}</div>` : ""}</figure>`).join("");
       $(".drawer-head h2", d).textContent = sc.label(x) || "Untitled";
+      const img = x.image || x.photo;
+      p.classList.toggle("can-focus", Boolean(img) && key !== "partners");
+    };
+    const focusDrag = (e) => {
+      const fig = e.target.closest?.(".pv");
+      if (!fig || !$(".preview", d).classList.contains("can-focus")) return;
+      const r = fig.getBoundingClientRect();
+      x.imagePos = { x: Math.round(Math.max(0, Math.min(100, ((e.clientX - r.left) / r.width) * 100))), y: Math.round(Math.max(0, Math.min(100, ((e.clientY - r.top) / r.height) * 100))) };
+      changed(); preview();
     };
     const render = () => {
       d.innerHTML = `
         <div class="drawer-head"><h2></h2><span class="pill">${esc(x.id)}</span><button class="ib" id="dclose" aria-label="Close">${ic.close}</button></div>
-        <div class="drawer-body"><div class="preview"></div><form id="dform" novalidate></form></div>
+        <div class="drawer-body"><div class="preview ${sc.square ? "sq" : ""}"></div><form id="dform" novalidate></form></div>
         <div class="drawer-foot">${key === "events" ? `<a class="btn btn-outline btn-sm" href="/events#${esc(x.id)}" target="_blank" rel="noopener">${ic.ext} View</a>` : key === "posts" ? `<a class="btn btn-outline btn-sm" href="/journal?p=${esc(x.id)}" target="_blank" rel="noopener">${ic.ext} View</a>` : ""}<span style="flex:1"></span><button class="btn btn-gold btn-sm" id="ddone">${ic.check} Done</button></div>`;
-      renderFields($("#dform", d), sc.fields, x, () => { changed(); preview(); }, { rerender: render });
+      const ctx = { rerender: render };
+      renderFields($("#dform", d), sc.fields, x, () => { changed(); preview(); }, ctx);
       preview();
+      const pv = $(".preview", d);
+      let dragging = false;
+      pv.addEventListener("pointerdown", (e) => { if (!pv.classList.contains("can-focus")) return; dragging = true; pv.setPointerCapture(e.pointerId); focusDrag(e); });
+      pv.addEventListener("pointermove", (e) => { if (dragging) focusDrag(e); });
+      pv.addEventListener("pointerup", () => { if (dragging) { dragging = false; ctx.redrawPoster?.(); } });
       $("#dclose", d).addEventListener("click", closeDrawer);
       $("#ddone", d).addEventListener("click", closeDrawer);
     };

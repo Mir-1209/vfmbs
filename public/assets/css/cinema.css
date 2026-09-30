@@ -608,3 +608,11 @@ a.cr-name:hover { color: var(--gold); letter-spacing: 0.1em; }
 .footer .giant { font-size: 17vw; }
 .bt-main b { font-size: clamp(56px, 10vw, 130px); }
 .mq-crown span { font-size: 24px; }
+
+/* ---------------- Photo tone & framing (set in the admin) ---------------- */
+.sc-poster .art { position: absolute; inset: 0; }
+.art.has-img img { transition: transform 0.6s var(--ease); }
+.art.tone-mono img { filter: grayscale(1) contrast(1.1); }
+.art.tone-mono::after { display: none; }
+.art.tone-original img { filter: none; }
+.art.tone-original::after { display: none; }

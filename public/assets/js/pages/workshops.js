@@ -16,7 +16,7 @@ V.ready.then((C) => {
       const days = Math.ceil((new Date(ws.deadline) - Date.now()) / 864e5);
       return `
       <article class="ws spot reveal reveal-d${i % 3}" style="${V.vars(ws.palette)}" id="${ws.id}">
-        <button class="ws-media" data-open="${ws.id}" aria-label="Episodes for ${esc(ws.title)}" data-cursor="Episodes">${V.art(ws.palette, ws.motif, { image: ws.image })}<span class="card-tag">${esc(V.trackName(ws.track))}</span>${app ? `<span class="card-flag gold">APPLIED</span>` : ""}<div class="card-label">${esc(ws.title)}</div></button>
+        <button class="ws-media" data-open="${ws.id}" aria-label="Episodes for ${esc(ws.title)}" data-cursor="Episodes">${V.artFor(ws)}<span class="card-tag">${esc(V.trackName(ws.track))}</span>${app ? `<span class="card-flag gold">APPLIED</span>` : ""}<div class="card-label">${esc(ws.title)}</div></button>
         <div class="ws-body">
           <h3>${esc(ws.subtitle)}</h3>
           <div class="sub">${esc(ws.schedule)}</div>

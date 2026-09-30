@@ -345,10 +345,24 @@
     const body = BASS[kind](r, C);
     return `<svg class="bass" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="100" height="100" fill="${C[0]}"/><g class="ink">${body}</g></svg>`;
   };
+  V.posterLayout = (m) => LAYOUT[m] || "cut";
+  const TONES = ["duotone", "mono", "original"];
   V.art = (palette = "gold", motif = "film", opts = {}) => {
     const img = V.safeUrl(opts.image);
     const C = V.inks[palette] || V.inks.gold;
-    return `<div class="art ${img ? "has-img" : ""}" style="${V.vars(palette)};--bg:${C[0]};--ink:${C[1]};--acc:${C[2]}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async">` : V.poster(palette, motif, opts.seed || "")}${opts.beam ? '<div class="beam"></div>' : ""}</div>`;
+    const tone = TONES.includes(opts.tone) ? opts.tone : "duotone";
+    const px = Math.max(0, Math.min(100, Number(opts.pos?.x ?? 50))), py = Math.max(0, Math.min(100, Number(opts.pos?.y ?? 50)));
+    const z = Math.max(1, Math.min(3, Number(opts.zoom) || 1));
+    const imgStyle = `object-position:${px}% ${py}%;transform-origin:${px}% ${py}%;${z > 1 ? `transform:scale(${z});` : ""}`;
+    return `<div class="art ${img ? `has-img tone-${tone}` : ""}" style="${V.vars(palette)};--bg:${C[0]};--ink:${C[1]};--acc:${C[2]}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async" style="${imgStyle}">` : V.poster(palette, motif, opts.seed || "")}${opts.beam ? '<div class="beam"></div>' : ""}</div>`;
+  };
+  // Render an item's art using everything the admin can set on it.
+  V.artFor = (x, o = {}) => {
+    if (!x) return V.art();
+    const image = o.image !== undefined ? o.image : x.image || x.photo || "";
+    return V.art(o.palette || x.palette || "gold", o.motif !== undefined ? o.motif : x.motif, {
+      image, seed: x.artSeed ?? x.id ?? "", pos: x.imagePos, zoom: x.imageZoom, tone: x.imageTone, ...o, image,
+    });
   };
 
   /* ---------------- QR (vendored qrcode-generator, MIT) ---------------- */
