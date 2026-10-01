@@ -2,7 +2,7 @@
 
 The official website for Greenlight: a cinematic, streaming-inspired site with real event ticketing, applications, and a **no-code admin dashboard** for the board.
 
-- **Public site:** home, events (RSVP → QR ticket), workshops, team, journal ("The Reel"), partners & sponsorship, about, apply, contact, My Studio, privacy/terms/code of conduct, 404
+- **Public site:** home, events (RSVP → QR ticket), workshops, team, journal ("The Reel"), partners & sponsorship, about, apply, contact, My Studio, decision letters, privacy/terms/code of conduct, 404
 - **Admin dashboard** at `/admin`: edit every event, workshop, story, team member, partner, homepage section and setting, and manage RSVPs, door check-in (QR scanner), applications, workshop apps, inbox, subscribers, and version history. No coding needed.
 - **Backend:** Vercel serverless functions + Upstash Redis. Tickets are cryptographically signed, and every form is validated, rate-limited and spam-protected.
 
@@ -12,7 +12,7 @@ The official website for Greenlight: a cinematic, streaming-inspired site with r
 
 The site is built to feel like a night at the movies:
 
-- **Pre-show → leader countdown → velvet curtains** on the first visit each session (visitors choose "with sound" or "silently").
+- **Pre-show → leader countdown → velvet curtains** on the first visit each session, with the projector soundtrack on.
 - **WebGL projector theater** on the home page: a volumetric beam, floating dust, audience silhouettes and a screen playing the featured title cards with gate weave and splice cuts.
 - **Celluloid everywhere:** a 24fps WebGL film layer adds grain, scratches, dust, hair, flicker and light leaks, and pages change with a **film-burn** transition.
 - **Saul Bass–style posters** are generated for every event, workshop, story and track (or use a real photo, which gets a duotone treatment).
@@ -41,7 +41,7 @@ That's it: RSVPs, applications and messages are now stored securely.
 | **Confirmation emails** (tickets, applications) | Create a free [Resend](https://resend.com) account, verify your domain, then add `RESEND_API_KEY` and `EMAIL_FROM` (e.g. `Greenlight <hello@vfmbs.org>`) |
 | **Email alerts for contact/sponsorship messages** | Add `NOTIFY_EMAIL` (requires Resend) |
 | **Upload images in the admin** | Vercel → **Storage → Blob** → connect to the project (adds `BLOB_READ_WRITE_TOKEN`) |
-| **Custom domain** | Vercel → **Settings → Domains**, then run `npm run set-domain -- https://your-domain.com`, commit and push. Also set `SITE_URL` so email links use it. |
+| **Custom domain** | Vercel → **Settings → Domains**. Then add `SITE_URL` = `https://your-domain.com` and redeploy. Each deploy writes the domain into canonical links, link previews, the sitemap and robots.txt, and email links use it too. Without `SITE_URL`, the site uses your Vercel production domain automatically. |
 
 See `.env.example` for the full list.
 
@@ -56,16 +56,35 @@ Go to **`/admin`** (there's also a small "Admin" link in the footer).
 | **Dashboard** | Live RSVP counts, application pipeline, unread messages, quick actions |
 | **Check-in** | Pick the event, then scan ticket QR codes with your phone camera (Chrome/Android) or type the code. It flags duplicates and wrong-event tickets |
 | **RSVPs** | See who's coming (dietary needs, questions), check people in, promote from the waitlist, export CSV, copy emails |
-| **Applications** | Read every application, set status, rate out of 5 stars, add private notes, and see booked interview slots. Export CSV |
-| **Workshop apps** | Accept, waitlist or decline, copy accepted emails, export |
+| **Applications** | Read every application, set status, rate out of 5 stars, add private notes, and see booked interview slots. When you set Accepted, Waitlisted or Declined, tick **Email the applicant** to send their decision (or use **Email decided applicants** for everyone at once). Export CSV |
+| **Workshop apps** | Accept, waitlist or decline (with the same decision email), copy accepted emails, export |
 | **Inbox / Subscribers** | Contact and sponsorship inquiries (reply by email), newsletter list export |
 | **Events, Workshops, Journal, Team, Partners, Tracks** | Add, edit, reorder, duplicate, hide or delete. Pick poster colors and icons, or upload a real photo |
 | **Homepage** | Hero slides, stats, "script to screen" panels, Top 10, reviews, FAQ, ticker, sponsorship packages |
-| **Settings** | Announcement bar, applications open/closed, deadline, recruitment timeline, **interview slot generator**, whether to show decisions to applicants, emails and socials |
-| **Emails** | Preview every automatic email (ticket, waitlist, membership application, workshop application, board notification) on desktop and phone, and send yourself a test |
+| **Settings** | Announcement bar, applications open/closed, deadline, recruitment timeline, **interview slot generator**, **decision letter text and signer**, emails and socials |
+| **Emails** | Preview every automatic email (ticket, waitlist, membership application, workshop application, decision ready, board notification) on desktop and phone, and send yourself a test |
+| **Archive & clear** | Download everything people submitted (RSVPs, applications, workshop apps, messages, subscribers and a log of every email sent) as one CSV, then clear it to keep the free database small. See below |
 | **Versions & backup** | Restore any of the last 15 published versions, export or import all content as a file |
 
 **How publishing works:** edits are drafts (auto-saved in your browser) until you press **Publish changes** (or ⌘/Ctrl+S). The live site updates within about 30 seconds.
+
+### Decision letters
+
+1. In **Applications** (or **Workshop apps**), set someone to **Accepted**, **Waitlisted** or **Declined**.
+2. Leave **Email the applicant that their decision is ready** ticked and press **Save**. They get a short, neutral email (it never reveals the outcome) with a **View my decision** button.
+3. On **/decision** they type their confirmation number (for example `VF-3FQ2K3`, or the 6-character workshop code) and read a formal letter on Greenlight letterhead. Accepted letters get confetti; waitlisted and declined letters don't. They can print it or save it as a PDF.
+
+Until an applicant is emailed, they keep seeing "In review", so you can make decisions quietly and release them when you're ready. Edit the letter text and signer in **Settings → Decision letters**. Use `{first}` for their first name and `{program}` for what they applied to. **Release all decisions now** shows every final decision without sending emails.
+
+### Archive & clear (keep the free database small)
+
+**Archive & clear** shows what's stored for the current period, since the last clear (or since launch). Each time you press **Clear database…** you must:
+
+1. **Download the CSV first.** That's one spreadsheet with a *Record type* column covering every RSVP, application, workshop application, message, subscriber, interview booking and email sent (who, what, when, delivered or not). The filename includes the period dates.
+2. **Choose what to clear.** Newsletter subscribers are unticked by default, and RSVPs for upcoming events are kept by default so tickets and check-in still work.
+3. **Type CLEAR.**
+
+Every clear is recorded under **Past periods** with its start and end dates, so you can match it to the file you saved. Website content (events, team, settings, versions) is never touched.
 
 **Preview mode:** before the database is connected, `/admin` offers a preview mode. Edits are saved only in your browser, so you can see them on the site.
 
@@ -79,7 +98,16 @@ Go to **`/admin`** (there's also a small "Admin" link in the footer).
 - Strict **Content-Security-Policy**, HSTS, X-Frame-Options, Referrer-Policy and Permissions-Policy headers (see `vercel.json`).
 - Everything rendered from the database or admin content is HTML-escaped, and links are restricted to `https://`, `mailto:` or site paths.
 - CSV exports are protected against spreadsheet formula injection.
-- `/admin`, `/api`, `/portal` and `/ticket` are excluded from search engines.
+- `/admin`, `/api`, `/portal`, `/ticket` and `/decision` are excluded from search engines.
+- Decision letters are only shown to someone with the confirmation number, and lookups are rate-limited.
+
+## 🔎 SEO & link sharing
+
+- Every public page has a unique title and description, a canonical URL, Open Graph and Twitter tags, and **its own 1200×630 share image** (`public/assets/og/`), so links look right on iMessage, WhatsApp, Slack, LinkedIn, Instagram DMs and X.
+- Search engines get structured data: **Organization + WebSite** on the home page, **Event** listings (dates, venue, free tickets, availability) on the events page, and **Course** listings on the workshops page, built from your live content.
+- `favicon.ico` (16/32/48), SVG and PNG favicons, an Apple touch icon, and a web app manifest.
+- `sitemap.xml` (dated on every deploy) and `robots.txt`. The build step (`scripts/build.mjs`) writes your real domain into all of them, from `SITE_URL` or Vercel's production domain.
+- After launch, add the site in [Google Search Console](https://search.google.com/search-console) and submit `/sitemap.xml`.
 
 ---
 
@@ -100,12 +128,13 @@ npm run pages      # regenerate the HTML pages from scripts/pages.py (only neede
 ## 📁 Project structure
 
 ```
-api/                      Serverless functions (9, under the Vercel Hobby limit of 12)
+api/                      Serverless functions (11, under the Vercel Hobby limit of 12)
   _lib/                   Shared: Redis client, auth/signing, validation, email, content
   admin.js                Admin API (login, content, RSVPs, check-in, applications, inbox…)
   content.js              Public content + live seat counts (edge-cached)
   rsvp.js  ticket.js      Ticketing
   apply.js workshop.js    Applications & interview booking
+  decision.js             Decision letter lookup (/decision)
   contact.js subscribe.js health.js
 public/                   The website (served as static files)
   *.html                  Pages (generated by scripts/pages.py)
@@ -117,7 +146,7 @@ public/                   The website (served as static files)
   assets/js/admin.js      Admin dashboard
   assets/data/content.json  Default content (used until the first publish)
   assets/brand/           Logo, social image, app icons
-scripts/                  dev server, checks, page generator, set-domain
+scripts/                  dev server, checks, page generator, build (domain + sitemap), set-domain
 vercel.json               Routing, security headers, caching
 ```
 

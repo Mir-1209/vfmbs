@@ -25,7 +25,12 @@ try {
 } catch (e) { no("content.json: " + e.message); }
 
 console.log("Files");
-for (const f of ["vercel.json", "public/index.html", "public/404.html", "public/admin.html", "public/robots.txt", "public/sitemap.xml", "public/site.webmanifest", "public/favicon.svg", "public/assets/brand/og.png"]) (fs.existsSync(path.join(root, f)) ? ok : no)(f);
+for (const f of ["vercel.json", "public/index.html", "public/404.html", "public/admin.html", "public/robots.txt", "public/sitemap.xml", "public/site.webmanifest", "public/favicon.svg", "public/favicon.ico", "public/apple-touch-icon.png", "public/decision.html", "public/assets/brand/og.png"]) (fs.existsSync(path.join(root, f)) ? ok : no)(f);
+// Every social-preview image referenced by a page must exist
+for (const f of fs.readdirSync(path.join(root, "public")).filter((f) => f.endsWith(".html"))) {
+  const img = (fs.readFileSync(path.join(root, "public", f), "utf8").match(/property="og:image" content="https?:\/\/[^/]+([^"]+)"/) || [])[1];
+  if (img && !fs.existsSync(path.join(root, "public", img))) no(`${f}: missing share image ${img}`);
+}
 const fns = fs.readdirSync(path.join(root, "api")).filter((f) => f.endsWith(".js"));
 (fns.length <= 12 ? ok : no)(`${fns.length} serverless functions (Vercel Hobby limit: 12)`);
 

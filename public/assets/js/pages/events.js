@@ -1,6 +1,25 @@
 /* Events page */
 V.ready.then((C) => {
   const { $, $$, esc, icons, Store } = V;
+  V.jsonLd("ld-events", {
+    "@context": "https://schema.org",
+    "@graph": C.events.filter((e) => !V.isPast(e)).slice(0, 20).map((e) => ({
+      "@type": "Event",
+      name: e.title,
+      description: e.desc || `${e.type || "Event"} by Vanderbilt Greenlight`,
+      startDate: e.date,
+      ...(e.end ? { endDate: e.end } : {}),
+      eventStatus: "https://schema.org/EventScheduled",
+      eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+      location: { "@type": "Place", name: e.location || "Vanderbilt University", address: { "@type": "PostalAddress", streetAddress: e.location || "Vanderbilt University", addressLocality: "Nashville", addressRegion: "TN", postalCode: "37240", addressCountry: "US" } },
+      image: [V.absImg(e.image, "/assets/og/events.png")],
+      url: `${location.origin}/events#${e.id}`,
+      isAccessibleForFree: true,
+      ...(e.capacity ? { maximumAttendeeCapacity: e.capacity } : {}),
+      offers: { "@type": "Offer", price: 0, priceCurrency: "USD", availability: V.seatsLeft(e) ? "https://schema.org/InStock" : "https://schema.org/SoldOut", url: `${location.origin}/events#${e.id}`, validFrom: new Date(Date.now() - 864e5).toISOString().slice(0, 10) },
+      organizer: V.orgRef(),
+    })),
+  });
   const types = ["All", ...new Set(C.events.map((e) => e.type)), "My RSVPs"];
   let filter = "All", view = "list", q = "", month = null;
   $("#filters").innerHTML = types.map((t) => `<button class="filter ${t === "All" ? "on" : ""}" aria-pressed="${t === "All"}">${esc(t)}</button>`).join("");

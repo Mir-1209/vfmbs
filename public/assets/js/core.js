@@ -378,5 +378,13 @@
   };
 
   V.ticketUrl = (token) => `${location.origin}/ticket?t=${encodeURIComponent(token)}`;
+  // Structured data (schema.org) for search engines, built from the live content.
+  V.jsonLd = (id, data) => {
+    let el = document.getElementById(id);
+    if (!el) { el = document.createElement("script"); el.type = "application/ld+json"; el.id = id; document.head.append(el); }
+    el.textContent = JSON.stringify(data).replace(/</g, "\\u003c");
+  };
+  V.absImg = (u, fallback) => (/^https:\/\//.test(u || "") ? u : u && u.startsWith("/") ? location.origin + u : location.origin + fallback);
+  V.orgRef = () => ({ "@type": "Organization", name: "Vanderbilt Greenlight", url: location.origin + "/" });
   V.demoCode = (prefix) => prefix + "-" + Math.random().toString(36).slice(2, 8).toUpperCase();
 })();

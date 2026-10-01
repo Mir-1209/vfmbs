@@ -7,7 +7,7 @@ V.ready.then(() => {
   const paras = (txt) => String(txt || "").split(/\n\s*\n/).map((p) => `<p>${esc(p.trim()).replace(/\n/g, "<br>")}</p>`).join("");
 
   function lookup(prefill = "", error = "") {
-    document.title = "Application Decision · Greenlight";
+    document.title = "Application Decision · Vanderbilt Greenlight";
     host.innerHTML = `
       <div class="dc-lookup">
         <p class="eyebrow">Application status</p>
@@ -55,7 +55,7 @@ V.ready.then(() => {
   }
 
   function letter(r) {
-    document.title = "Your Decision · Greenlight";
+    document.title = "Your Decision · Vanderbilt Greenlight";
     const signer = r.signer || "The Board of Vanderbilt Greenlight";
     host.innerHTML = `
       <article class="dc-letter" aria-label="Decision letter">

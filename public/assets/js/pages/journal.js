@@ -9,7 +9,7 @@ V.ready.then((C) => {
   const main = $("#main");
 
   if (post) {
-    document.title = `${post.title} · The Reel · Greenlight`;
+    document.title = `${post.title} · The Reel · Vanderbilt Greenlight`;
     const paras = String(post.body || "").split(/\n{2,}/).map((p) => p.trim()).filter(Boolean)
       .map((p) => p.startsWith("> ") ? `<blockquote>${esc(p.slice(2))}</blockquote>` : `<p>${esc(p).replace(/\n/g, "<br>")}</p>`).join("");
     const words = String(post.body || "").split(/\s+/).length;

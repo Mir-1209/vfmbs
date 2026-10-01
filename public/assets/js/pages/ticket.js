@@ -14,7 +14,7 @@ V.ready.then(async () => {
   const { ticket: t, event: ev } = data;
   const past = ev.end && new Date(ev.end) < new Date();
   const stamp = t.checkedIn ? ["ADMITTED", "stamp-used"] : t.waitlist ? ["WAITLIST", "stamp-wait"] : past ? ["ENDED", "stamp-used"] : ["VALID", "stamp-valid"];
-  document.title = `Ticket · ${ev.title} · Greenlight`;
+  document.title = `Ticket · ${ev.title} · Vanderbilt Greenlight`;
   host.innerHTML = `
     <div class="eyebrow">${t.waitlist ? "Standby ticket" : "Your ticket"} · No. ${V.pad(t.no, 3)}</div>
     <h1 class="h2" style="margin-bottom:26px">${esc(ev.title)}</h1>

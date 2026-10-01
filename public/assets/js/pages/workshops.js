@@ -1,6 +1,20 @@
 /* Workshops page */
 V.ready.then((C) => {
   const { $, $$, esc, Store } = V;
+  V.jsonLd("ld-workshops", {
+    "@context": "https://schema.org",
+    "@graph": C.workshops.map((w) => ({
+      "@type": "Course",
+      name: w.title,
+      description: w.subtitle || w.desc || `${w.title}: a Vanderbilt Greenlight workshop`,
+      url: `${location.origin}/workshops#${w.id}`,
+      provider: V.orgRef(),
+      isAccessibleForFree: true,
+      ...(w.level ? { educationalLevel: w.level } : {}),
+      hasCourseInstance: { "@type": "CourseInstance", courseMode: "Onsite", location: w.location || "Vanderbilt University, Nashville, TN" },
+      offers: { "@type": "Offer", price: 0, priceCurrency: "USD", category: "Free" },
+    })),
+  });
   let track = "all", level = "all";
   $("#ws-tracks").innerHTML = [["all", "All tracks"], ...C.tracks.map((t) => [t.id, t.name])].map(([id, n]) => `<button class="filter ${id === "all" ? "on" : ""}" data-t="${id}">${esc(n)}</button>`).join("");
   $$("#ws-tracks .filter").forEach((b) => b.addEventListener("click", () => { track = b.dataset.t; $$("#ws-tracks .filter").forEach((x) => x.classList.toggle("on", x === b)); render(); }));

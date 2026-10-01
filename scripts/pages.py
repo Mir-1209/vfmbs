@@ -3,7 +3,16 @@ import os, json
 ROOT = os.path.join(os.path.dirname(__file__), "..", "public")
 SITE = "https://vfmbs.vercel.app"
 
+OG_PAGES = {"/events": "events", "/workshops": "workshops", "/team": "team", "/journal": "journal", "/partners": "partners", "/about": "about", "/apply": "apply", "/contact": "contact"}
+
 def head(title, desc, path, extra=""):
+    if title.endswith(" · Greenlight"):
+        title = title[: -len(" · Greenlight")] + " · Vanderbilt Greenlight"
+    img = f"{SITE}/assets/og/{OG_PAGES[path]}.png" if path in OG_PAGES else f"{SITE}/assets/brand/og.png"
+    alt = "Vanderbilt Greenlight: the business of film and media"
+    index = "noindex" not in extra
+    robots = '<meta name="robots" content="index, follow, max-image-preview:large">\n' if index else ""
+    canonical = f'<link rel="canonical" href="{SITE}{path}">\n' if index else ""
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -11,18 +20,29 @@ def head(title, desc, path, extra=""):
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{title}</title>
 <meta name="description" content="{desc}">
-<meta name="theme-color" content="#070707">
-<link rel="canonical" href="{SITE}{path}">
+{robots}{canonical}<meta name="theme-color" content="#070707">
+<meta name="color-scheme" content="dark">
+<meta name="application-name" content="Vanderbilt Greenlight">
+<meta name="apple-mobile-web-app-title" content="Greenlight">
+<meta name="format-detection" content="telephone=no">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Greenlight">
+<meta property="og:site_name" content="Vanderbilt Greenlight">
+<meta property="og:locale" content="en_US">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{SITE}{path}">
-<meta property="og:image" content="{SITE}/assets/brand/og.png">
+<meta property="og:image" content="{img}">
+<meta property="og:image:secure_url" content="{img}">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{alt}">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="{SITE}/assets/brand/og.png">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{desc}">
+<meta name="twitter:image" content="{img}">
+<meta name="twitter:image:alt" content="{alt}">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -66,7 +86,12 @@ def fill(html):
         html = html.replace(f'style="{{v}}" data-palette="{k}"', f'style="--a1:{a};--a2:{b};--a3:{c}" data-palette="{k}"')
     return html
 
-ORG_LD = json.dumps({"@context": "https://schema.org", "@type": "Organization", "name": "Vanderbilt Greenlight", "alternateName": "Greenlight", "url": SITE, "logo": SITE + "/assets/brand/logo.svg", "email": "vfmbs@vanderbilt.edu", "parentOrganization": {"@type": "CollegeOrUniversity", "name": "Vanderbilt University"}, "address": {"@type": "PostalAddress", "addressLocality": "Nashville", "addressRegion": "TN", "addressCountry": "US"}})
+CONTENT = json.load(open(os.path.join(ROOT, "assets", "data", "content.json")))
+_st = CONTENT.get("settings", {})
+SAME_AS = [u for u in (_st.get("instagram"), _st.get("linkedin"), _st.get("tiktok"), _st.get("youtube")) if isinstance(u, str) and u.startswith("https://")]
+ORG = {"@type": "Organization", "@id": SITE + "/#org", "name": "Vanderbilt Greenlight", "alternateName": ["Greenlight", "Vanderbilt Film & Media Business Society"], "description": "Vanderbilt's student society for the business of film and media: film finance, media strategy, streaming, music and sports business.", "url": SITE + "/", "logo": {"@type": "ImageObject", "url": SITE + "/assets/brand/icon-512.png", "width": 512, "height": 512}, "image": SITE + "/assets/brand/og.png", "email": _st.get("email") or "vfmbs@vanderbilt.edu", "parentOrganization": {"@type": "CollegeOrUniversity", "name": "Vanderbilt University", "url": "https://www.vanderbilt.edu"}, "address": {"@type": "PostalAddress", "addressLocality": "Nashville", "addressRegion": "TN", "addressCountry": "US"}}
+if SAME_AS: ORG["sameAs"] = SAME_AS
+ORG_LD = json.dumps({"@context": "https://schema.org", "@graph": [ORG, {"@type": "WebSite", "@id": SITE + "/#website", "url": SITE + "/", "name": "Vanderbilt Greenlight", "alternateName": "Greenlight", "publisher": {"@id": SITE + "/#org"}, "inLanguage": "en-US"}]})
 
 LAUREL = '<svg viewBox="0 0 40 70" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M35 68C12 55 4 30 14 4M14 14c-6-2-9 2-9 2s4 3 9 0M11 26c-6-1-9 3-9 3s5 3 9-1M10 38c-6 0-8 5-8 5s5 2 9-2M13 50c-5 1-7 6-7 6s5 1 8-3M19 60c-4 2-5 7-5 7s5 0 7-4"/></svg>'
 def laurel(a, b, c):
