@@ -488,7 +488,7 @@
     ["Overview", [["dashboard", "Dashboard", ic.dash], ["checkin", "Check-in", ic.scan]]],
     ["People", [["rsvps", "RSVPs", ic.ticket], ["applications", "Applications", ic.apps], ["wsapps", "Workshop apps", ic.ws], ["inbox", "Inbox", ic.inbox], ["subscribers", "Subscribers", ic.subs]]],
     ["Content", [["events", "Events", ic.cal], ["workshops", "Workshops", ic.ws], ["posts", "Journal", ic.pen], ["team", "Team", ic.users], ["partners", "Partners", ic.hand], ["tracks", "Tracks", ic.tracks]]],
-    ["Site", [["homepage", "Homepage", ic.home], ["settings", "Settings", ic.gear], ["versions", "Versions & backup", ic.hist]]],
+    ["Site", [["homepage", "Homepage", ic.home], ["settings", "Settings", ic.gear], ["emails", "Emails", ic.mail], ["versions", "Versions & backup", ic.hist]]],
   ];
   const TITLES = Object.fromEntries(NAV.flatMap(([, it]) => it.map(([k, l]) => [k, l])));
 
@@ -551,9 +551,9 @@
     const v = $("#view");
     v.innerHTML = "";
     scrollTo(0, 0);
-    const people = ["rsvps", "applications", "wsapps", "inbox", "subscribers", "checkin"];
+    const people = ["rsvps", "applications", "wsapps", "inbox", "subscribers", "checkin", "emails"];
     if (people.includes(S.view) && !live()) return v.append(needDB());
-    ({ dashboard, checkin, rsvps, applications, wsapps, inbox, subscribers, homepage, settings, versions }[S.view] || collection)(v, S.view);
+    ({ dashboard, checkin, rsvps, applications, wsapps, inbox, subscribers, homepage, settings, versions, emails }[S.view] || collection)(v, S.view);
   }
   function needDB() {
     const d = document.createElement("div");
@@ -1022,6 +1022,54 @@
     $("#sq").addEventListener("input", (e) => { q = e.target.value.toLowerCase(); draw(); });
     $("#scopy").addEventListener("click", () => copy(subs.map((s) => s.email).join(", "), `${subs.length} emails copied`));
     $("#scsv").addEventListener("click", () => csv(subs, [["email", "Email"], ["source", "Source"], [(s) => (s.ts ? new Date(s.ts).toISOString() : ""), "Joined"]], "subscribers"));
+    draw();
+  }
+
+
+  /* =====================================================================
+     EMAILS: previews of every automatic email + send a test
+     ===================================================================== */
+  async function emails(v) {
+    const NAMES = [["ticket", "RSVP ticket", "Sent to a guest when they RSVP"], ["waitlist", "Waitlist", "Sent when an event is full"], ["application", "Membership application", "Sent when someone applies to join"], ["workshop", "Workshop application", "Sent when someone applies to a workshop"], ["contact", "Contact / sponsorship", "Sent to NOTIFY_EMAIL (the board)"]];
+    v.innerHTML = `<div class="box">Loading previews…</div>`;
+    let data;
+    try { data = await api("emails"); } catch (e) { v.innerHTML = `<div class="empty-s">${esc(e.message)}</div>`; return; }
+    let cur = "ticket", width = 640;
+    const me = V.LS.get("admin-test-email", "");
+    const draw = () => {
+      const t = data.templates[cur];
+      v.innerHTML = `
+        ${data.enabled ? "" : `<div class="box" style="border-color:rgba(255,199,90,.4)"><h2>Email isn't connected yet</h2><p class="help" style="margin:0">These are previews of what guests will receive. To actually send them, add <code>RESEND_API_KEY</code> and <code>EMAIL_FROM</code> in Vercel and redeploy (see README → Confirmation emails).</p></div>`}
+        <div class="em-wrap">
+          <div class="em-list">${NAMES.map(([k, n, d]) => `<button class="em-item ${k === cur ? "on" : ""}" data-k="${k}"><b>${n}</b><span>${d}</span></button>`).join("")}
+            <div class="box" style="margin-top:14px"><h2 style="font-size:14px">Send me a test</h2>
+              <form id="em-test" class="tbl-tools" style="margin:0;flex-direction:column;align-items:stretch">
+                <input class="input" type="email" id="em-to" placeholder="you@vanderbilt.edu" value="${esc(me)}" required>
+                <button class="btn btn-gold btn-sm" type="submit" ${data.enabled ? "" : "disabled"}>${ic.mail} Send “${esc(NAMES.find((x) => x[0] === cur)[1])}”</button>
+              </form>
+              <p class="help" style="margin:10px 0 0">Sample data, marked [TEST]. Check spam the first time.</p></div>
+          </div>
+          <div>
+            <div class="tbl-tools"><div class="em-subject"><span>Subject</span>${esc(t.subject)}</div><span class="grow"></span>
+              <div class="seg" style="width:auto"><button class="${width === 640 ? "on" : ""}" data-w="640">Desktop</button><button class="${width === 390 ? "on" : ""}" data-w="390">Phone</button></div></div>
+            <div class="em-frame"><iframe title="Email preview" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" style="width:${width}px"></iframe></div>
+            <p class="help">Preview uses fallback fonts, like Gmail does. Apple Mail and iPhone show the full film typography.</p>
+          </div>
+        </div>`;
+      const fr = $("iframe", v);
+      fr.srcdoc = t.html;
+      fr.addEventListener("load", () => { try { fr.style.height = fr.contentDocument.documentElement.scrollHeight + 20 + "px"; } catch { fr.style.height = "1500px"; } });
+      $$(".em-item", v).forEach((b) => b.addEventListener("click", () => { cur = b.dataset.k; draw(); }));
+      $$("[data-w]", v).forEach((b) => b.addEventListener("click", () => { width = +b.dataset.w; draw(); }));
+      $("#em-test", v).addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const to = $("#em-to", v).value.trim(), btn = $("button[type=submit]", e.target);
+        V.LS.set("admin-test-email", to);
+        btn.classList.add("loading");
+        try { await api("emailtest", { type: cur, to }); toast(`Test sent to ${to}`); } catch (err) { fail(err); }
+        btn.classList.remove("loading");
+      });
+    };
     draw();
   }
 

@@ -5,7 +5,8 @@ import { cmd, P, parse } from "./_lib/kv.js";
 import { signId, verifyId } from "./_lib/auth.js";
 import { str, email, isBot } from "./_lib/validate.js";
 import { loadContent, findWorkshop } from "./_lib/content.js";
-import { sendEmail, layout, esc } from "./_lib/email.js";
+import { sendEmail, siteUrl } from "./_lib/email.js";
+import { workshopEmail } from "./_lib/templates.js";
 
 export default handler(async (req, res) => {
   allow(req, ["GET", "POST"]);
@@ -45,10 +46,7 @@ export default handler(async (req, res) => {
   if (!claimed) throw new HttpError(409, "You've already applied to this workshop.");
   const code = `${ws.id}:${randomCode(6)}`;
   await cmd("HSET", `${P}wsapps:${ws.id}`, code, JSON.stringify({ ...app, code }));
-  await sendEmail({
-    to: app.email,
-    subject: `Workshop application: ${ws.title}`,
-    html: layout({ kicker: "Workshop application received", title: ws.title, body: `<p>Thanks, ${esc(app.name.split(" ")[0])}. We'll email decisions shortly after the deadline.</p><p>${esc(ws.schedule || "")}</p>` }),
-  });
+  const mail = workshopEmail({ base: siteUrl(req), ws, app, code: code.split(":")[1], s: content.settings || {} });
+  await sendEmail({ to: app.email, subject: mail.subject, html: mail.html, text: mail.text });
   send(res, 200, { code: code.split(":")[1], token: signId("ws", code) });
 });

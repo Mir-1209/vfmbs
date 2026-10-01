@@ -3,7 +3,25 @@ import { handler, send, allow, readBody, query, rateLimit, sameOrigin, requireKV
 import { cmd, pipe, P, parse, toObj, hgetallJSON, getJSON, setJSON } from "./_lib/kv.js";
 import { checkPassword, sessionCookie, clearCookie, isAdmin, requireAdmin, verifyId } from "./_lib/auth.js";
 import { loadContent, defaultContent } from "./_lib/content.js";
-import { str } from "./_lib/validate.js";
+import { str, email as vEmail } from "./_lib/validate.js";
+import { signId } from "./_lib/auth.js";
+import { siteUrl, sendEmail, emailEnabled } from "./_lib/email.js";
+import { ticketEmail, applicationEmail, workshopEmail, contactEmail } from "./_lib/templates.js";
+
+// Realistic sample data for previews / test sends (built from the live content).
+function sampleEmails(req, c) {
+  const base = siteUrl(req), st = c.settings || {};
+  const ev = (c.events || []).find((e) => new Date(e.end || e.date) > new Date()) || (c.events || [])[0] || { id: "ev-sample", title: "Greenlight Summit", type: "Speaker", date: new Date(Date.now() + 7 * 864e5).toISOString(), location: "Sarratt Cinema" };
+  const ws = (c.workshops || [])[0] || { id: "ws-sample", title: "The Deal Room", episodes: [] };
+  const app = { name: "Ada Lovelace", pref: "Ada", email: "ada@vanderbilt.edu", year: "2028", major: "Economics & CMA", tracks: (c.tracks || []).slice(0, 2).map((t) => t.id) };
+  return {
+    ticket: ticketEmail({ base, ev, s: st, t: { token: signId("ticket", "SAMPLE01"), code: "SAMPLE01", no: 42, waitlist: false, name: app.name } }),
+    waitlist: ticketEmail({ base, ev, s: st, t: { token: signId("ticket", "SAMPLE02"), code: "SAMPLE02", no: 3, waitlist: true, name: app.name } }),
+    application: applicationEmail({ base, app, id: "VF-SAMPLE", token: signId("app", "VF-SAMPLE"), tracks: c.tracks || [], s: st }),
+    workshop: workshopEmail({ base, ws, app, code: "K7M2QX", s: st }),
+    contact: contactEmail({ base, s: st, msg: { name: "Jordan Rivera", email: "jordan@studio.com", org: "Example Studios", topic: "Sponsorship", message: "Hi Greenlight team,\n\nWe'd love to sponsor the Greenlight Summit this year and host a Deal Room case for your members. Could we set up a call next week?\n\nBest,\nJordan", ts: Date.now() } }),
+  };
+}
 
 const HISTORY = 15;
 const CONTENT_KEYS = ["settings", "featured", "tracks", "events", "workshops", "team", "partners", "posts", "stats", "top10", "reviews", "faq", "ticker", "sponsorTiers", "pipeline"];
@@ -65,6 +83,13 @@ const GET = {
   async subs() {
     const all = await hgetallJSON("subs");
     return { subs: Object.entries(all).map(([email, m]) => ({ email, ...(typeof m === "object" ? m : {}) })).sort((a, b) => (b.ts || 0) - (a.ts || 0)) };
+  },
+
+  async emails(req) {
+    const all = sampleEmails(req, await loadContent(req));
+    const out = {};
+    for (const [k, v] of Object.entries(all)) out[k] = { subject: v.subject, html: v.html };
+    return { enabled: emailEnabled(), templates: out };
   },
 
   async history() {
@@ -187,6 +212,18 @@ const POST = {
 
   async sub(req, b) {
     await cmd("HDEL", P + "subs", String(b.email || "").toLowerCase());
+    return { ok: true };
+  },
+
+  async emailtest(req, b) {
+    if (!emailEnabled()) throw new HttpError(503, "Email isn't connected yet. Add RESEND_API_KEY and EMAIL_FROM in Vercel, then redeploy.");
+    await rateLimit(req, "emailtest", 10, 3600);
+    const to = vEmail(b.to);
+    const all = sampleEmails(req, await loadContent(req));
+    const m = all[b.type];
+    if (!m) throw new HttpError(400, "Unknown template.");
+    const ok = await sendEmail({ to, subject: "[TEST] " + m.subject, html: m.html, text: m.text });
+    if (!ok) throw new HttpError(502, "Resend rejected the email. Check Resend → Emails/Logs (usually an unverified domain or a wrong EMAIL_FROM).");
     return { ok: true };
   },
 

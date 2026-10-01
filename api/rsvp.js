@@ -5,7 +5,8 @@ import { cmd, pipe, P, parse } from "./_lib/kv.js";
 import { signId, verifyId } from "./_lib/auth.js";
 import { str, email, list, isBot } from "./_lib/validate.js";
 import { loadContent, findEvent } from "./_lib/content.js";
-import { sendEmail, layout, siteUrl, esc } from "./_lib/email.js";
+import { sendEmail, siteUrl } from "./_lib/email.js";
+import { ticketEmail } from "./_lib/templates.js";
 
 export default handler(async (req, res) => {
   allow(req, ["POST"]);
@@ -61,17 +62,8 @@ export default handler(async (req, res) => {
   await pipe([["HSET", `${P}rsvps:${ev.id}`, code, JSON.stringify(ticket)], ["SET", `${P}ticket:${code}`, ev.id]]);
 
   const token = signId("ticket", code);
-  const link = `${siteUrl(req)}/ticket?t=${encodeURIComponent(token)}`;
-  await sendEmail({
-    to: rec.email,
-    subject: waitlist ? `Waitlist confirmed: ${ev.title}` : `Your ticket: ${ev.title}`,
-    html: layout({
-      kicker: waitlist ? "Waitlist · Standby" : `Admit one · No. ${String(no).padStart(3, "0")}`,
-      title: ev.title,
-      body: `<p>Hi ${esc(rec.name.split(" ")[0])},</p><p>${waitlist ? "The house is full, so you're on the waitlist. We'll email you if a seat opens up." : "You're on the list. Show the QR code on your ticket at the door."}</p><p><b>${esc(ev.location)}</b></p>`,
-      cta: { label: "Open my ticket", href: link },
-    }),
-  });
+  const mail = ticketEmail({ base: siteUrl(req), ev, t: { token, code, no, waitlist, name: rec.name }, s: content.settings || {} });
+  await sendEmail({ to: rec.email, subject: mail.subject, html: mail.html, text: mail.text });
 
   send(res, 200, { ticket: { token, code, no, waitlist, eventId: ev.id, name: rec.name } });
 });

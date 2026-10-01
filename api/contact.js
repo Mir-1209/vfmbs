@@ -2,7 +2,9 @@
 import { handler, send, allow, readBody, rateLimit, sameOrigin, requireKV, randomCode } from "./_lib/http.js";
 import { cmd, P } from "./_lib/kv.js";
 import { str, email, oneOf, isBot } from "./_lib/validate.js";
-import { sendEmail, layout, esc } from "./_lib/email.js";
+import { sendEmail, siteUrl } from "./_lib/email.js";
+import { contactEmail } from "./_lib/templates.js";
+import { loadContent } from "./_lib/content.js";
 
 const TOPICS = ["General", "Sponsorship", "Speaking", "Press", "Alumni", "Other"];
 
@@ -25,12 +27,9 @@ export default handler(async (req, res) => {
   const id = Date.now().toString(36) + randomCode(4);
   await cmd("HSET", P + "inbox", id, JSON.stringify(msg));
   if (process.env.NOTIFY_EMAIL) {
-    await sendEmail({
-      to: process.env.NOTIFY_EMAIL,
-      replyTo: msg.email,
-      subject: `[Greenlight ${msg.topic}] ${msg.name}${msg.org ? " · " + msg.org : ""}`,
-      html: layout({ kicker: `New ${msg.topic} inquiry`, title: msg.name, body: `<p>${esc(msg.email)}${msg.org ? " · " + esc(msg.org) : ""}</p><p style="white-space:pre-wrap">${esc(msg.message)}</p>` }),
-    });
+    const s = (await loadContent(req).catch(() => ({}))).settings || {};
+    const mail = contactEmail({ base: siteUrl(req), msg, s });
+    await sendEmail({ to: process.env.NOTIFY_EMAIL, replyTo: msg.email, subject: mail.subject, html: mail.html, text: mail.text });
   }
   send(res, 200, { ok: true });
 });

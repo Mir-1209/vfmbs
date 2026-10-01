@@ -9,7 +9,8 @@ import { cmd, pipe, P, parse, toObj } from "./_lib/kv.js";
 import { signId, verifyId } from "./_lib/auth.js";
 import { str, email, list, url, oneOf, isBot } from "./_lib/validate.js";
 import { loadContent } from "./_lib/content.js";
-import { sendEmail, layout, siteUrl, esc } from "./_lib/email.js";
+import { sendEmail, siteUrl } from "./_lib/email.js";
+import { applicationEmail } from "./_lib/templates.js";
 
 const YEARS = ["2027", "2028", "2029", "2030", "Graduate"];
 
@@ -108,15 +109,7 @@ export default handler(async (req, res) => {
   await cmd("HSET", P + "apps", id, JSON.stringify(app));
   const token = signId("app", id);
 
-  await sendEmail({
-    to: app.email,
-    subject: "Application received: Greenlight",
-    html: layout({
-      kicker: "Casting call · Application received",
-      title: `That's a wrap, ${app.pref || app.name.split(" ")[0]}.`,
-      body: `<p>We've received your application (<b>${esc(id)}</b>). Next step: book your interview slot.</p>`,
-      cta: { label: "Book my interview", href: `${siteUrl(req)}/apply?t=${encodeURIComponent(token)}` },
-    }),
-  });
+  const mail = applicationEmail({ base: siteUrl(req), app, id, token, tracks: content.tracks || [], s });
+  await sendEmail({ to: app.email, subject: mail.subject, html: mail.html, text: mail.text });
   send(res, 200, { id, token });
 });

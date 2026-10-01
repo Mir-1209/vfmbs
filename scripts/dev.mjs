@@ -36,6 +36,7 @@ function applyHeaders(res, p) {
 }
 
 const server = http.createServer(async (req, res) => {
+  req.headers["x-forwarded-proto"] ||= "http";
   const url = new URL(req.url, `http://${req.headers.host}`);
   let p = decodeURIComponent(url.pathname);
   applyHeaders(res, p);

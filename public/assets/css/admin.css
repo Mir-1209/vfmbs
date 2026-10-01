@@ -221,3 +221,17 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 .ad .swatch { width: 44px; height: 44px; }
 @media (max-width: 700px) { .drawer .preview { grid-template-columns: 1fr; } .ad-grid { grid-template-columns: repeat(2, 1fr); } .ad-sliders label { grid-template-columns: 1fr; } }
 .drawer .preview.sq { grid-template-columns: 240px 180px; align-items: start; }
+
+/* ---------------- Email previews ---------------- */
+.em-wrap { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
+.em-list { display: grid; gap: 6px; position: sticky; top: 80px; }
+.em-item { display: grid; gap: 3px; text-align: left; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line); background: #111113; }
+.em-item:hover { border-color: var(--line-2); }
+.em-item.on { border-color: var(--gold); background: rgba(207, 174, 112, 0.08); }
+.em-item b { font-size: 14px; }
+.em-item span { font-size: 12px; color: var(--muted); }
+.em-subject { font-size: 14px; display: flex; gap: 10px; align-items: baseline; min-width: 0; }
+.em-subject span { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); }
+.em-frame { background: #000; border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; justify-content: center; overflow: auto; }
+.em-frame iframe { border: 0; background: #050505; height: 1400px; max-width: 100%; transition: width 0.3s var(--ease); }
+@media (max-width: 1000px) { .em-wrap { grid-template-columns: 1fr; } .em-list { position: static; } }

@@ -62,6 +62,7 @@ Go to **`/admin`** (there's also a small "Admin" link in the footer).
 | **Events, Workshops, Journal, Team, Partners, Tracks** | Add, edit, reorder, duplicate, hide or delete. Pick poster colors and icons, or upload a real photo |
 | **Homepage** | Hero slides, stats, "script to screen" panels, Top 10, reviews, FAQ, ticker, sponsorship packages |
 | **Settings** | Announcement bar, applications open/closed, deadline, recruitment timeline, **interview slot generator**, whether to show decisions to applicants, emails and socials |
+| **Emails** | Preview every automatic email (ticket, waitlist, membership application, workshop application, board notification) on desktop and phone, and send yourself a test |
 | **Versions & backup** | Restore any of the last 15 published versions, export or import all content as a file |
 
 **How publishing works:** edits are drafts (auto-saved in your browser) until you press **Publish changes** (or ⌘/Ctrl+S). The live site updates within about 30 seconds.
