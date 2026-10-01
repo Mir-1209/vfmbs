@@ -11,8 +11,7 @@
     "dev": "node scripts/dev.mjs",
     "check": "node scripts/check.mjs",
     "set-domain": "node scripts/set-domain.mjs",
-    "pages": "python3 scripts/pages.py",
-    "build": "node build.mjs"
+    "pages": "python3 scripts/pages.py"
   },
   "dependencies": {
     "@vercel/blob": "^2.0.0"

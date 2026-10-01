@@ -41,7 +41,7 @@ That's it: RSVPs, applications and messages are now stored securely.
 | **Confirmation emails** (tickets, applications) | Create a free [Resend](https://resend.com) account, verify your domain, then add `RESEND_API_KEY` and `EMAIL_FROM` (e.g. `Greenlight <hello@vfmbs.org>`) |
 | **Email alerts for contact/sponsorship messages** | Add `NOTIFY_EMAIL` (requires Resend) |
 | **Upload images in the admin** | Vercel → **Storage → Blob** → connect to the project (adds `BLOB_READ_WRITE_TOKEN`) |
-| **Custom domain** | Vercel → **Settings → Domains**. Then add `SITE_URL` = `https://your-domain.com` and redeploy. Each deploy writes the domain into canonical links, link previews, the sitemap and robots.txt, and email links use it too. Without `SITE_URL`, the site uses your Vercel production domain automatically. |
+| **Custom domain** | Vercel → **Settings → Domains**, then run `npm run set-domain -- https://your-domain.com`, commit and push (updates canonical links, link previews, sitemap and robots.txt). Also set `SITE_URL` so email links use it. |
 
 See `.env.example` for the full list.
 
@@ -106,7 +106,7 @@ Every clear is recorded under **Past periods** with its start and end dates, so 
 - Every public page has a unique title and description, a canonical URL, Open Graph and Twitter tags, and **its own 1200×630 share image** (`public/assets/og/`), so links look right on iMessage, WhatsApp, Slack, LinkedIn, Instagram DMs and X.
 - Search engines get structured data: **Organization + WebSite** on the home page, **Event** listings (dates, venue, free tickets, availability) on the events page, and **Course** listings on the workshops page, built from your live content.
 - `favicon.ico` (16/32/48), SVG and PNG favicons, an Apple touch icon, and a web app manifest.
-- `sitemap.xml` (dated on every deploy) and `robots.txt`. The build step (`build.mjs`) writes your real domain into all of them, from `SITE_URL` or Vercel's production domain.
+- `sitemap.xml` and `robots.txt`. If you move to a custom domain, `npm run set-domain -- https://your-domain.com` rewrites every URL.
 - After launch, add the site in [Google Search Console](https://search.google.com/search-console) and submit `/sitemap.xml`.
 
 ---
@@ -147,7 +147,6 @@ public/                   The website (served as static files)
   assets/data/content.json  Default content (used until the first publish)
   assets/brand/           Logo, social image, app icons
 scripts/                  dev server, checks, page generator, set-domain
-build.mjs                 Vercel build step: stamps your domain into links, sitemap and robots.txt
 vercel.json               Routing, security headers, caching
 ```
 
