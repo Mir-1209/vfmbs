@@ -1,4 +1,5 @@
 .data
-scripts
+scripts/*
+!scripts/build.mjs
 docs
 *.md
