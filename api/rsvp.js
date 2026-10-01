@@ -63,7 +63,7 @@ export default handler(async (req, res) => {
 
   const token = signId("ticket", code);
   const mail = ticketEmail({ base: siteUrl(req), ev, t: { token, code, no, waitlist, name: rec.name }, s: content.settings || {} });
-  await sendEmail({ to: rec.email, subject: mail.subject, html: mail.html, text: mail.text });
+  await sendEmail({ to: rec.email, subject: mail.subject, html: mail.html, text: mail.text, kind: waitlist ? "waitlist" : "ticket" });
 
   send(res, 200, { ticket: { token, code, no, waitlist, eventId: ev.id, name: rec.name } });
 });

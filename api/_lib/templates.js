@@ -267,3 +267,28 @@ export function contactEmail({ base, msg, s = {} }) {
   const text = `New ${msg.topic} inquiry\n\nFrom: ${msg.name} <${msg.email}>${msg.org ? `\nOrganization: ${msg.org}` : ""}\nReceived: ${received}\n\n${msg.message}\n\nReply directly to this email to answer them. Admin inbox: ${base}/admin#inbox`;
   return { subject: `[Greenlight · ${msg.topic}] ${msg.name}${msg.org ? " · " + msg.org : ""}`, preheader: "", html, text };
 }
+
+/* ---------------- 5. Decision ready (membership or workshop) ---------------- */
+// Deliberately neutral: the email never reveals the outcome, it points to the letter.
+export function decisionReadyEmail({ base, name, ref, program, s = {} }) {
+  const link = `${base}/decision`;
+  const body = `
+    ${section(`<div style="font-family:${F.sans};font-size:16px;line-height:1.7;color:${C.text}">
+      Thank you for your patience while the board reviewed applications for ${esc(program)}. A decision letter about your application has been posted, and you can read it at any time using your confirmation number below.</div>`, "6px")}
+    ${section(`<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+      <td style="border:1px solid ${C.line};border-radius:12px;padding:18px 20px;background:${C.band}">
+        <div style="font-family:${F.mono};font-size:10px;letter-spacing:3px;text-transform:uppercase;color:${C.dim}">Your confirmation number</div>
+        <div style="font-family:${F.mono};font-size:26px;font-weight:700;letter-spacing:4px;color:${C.gold};margin-top:6px">${esc(ref)}</div>
+      </td></tr></table>`, "14px")}
+    ${section(`${button("View my decision", link)}`, "6px")}
+    ${section(note(`<b style="color:${C.cream}">How it works.</b> Open the page, enter your confirmation number, and your letter will appear. For your privacy, the letter is only shown to someone with this number.`, C.gold), "8px 40px 36px")}`;
+  const html = shell({
+    base, s, preheader: `A decision on your application (${ref}) is ready to view.`, scene: "Final cut",
+    kicker: `<span style="color:${C.green}">●</span> Application update`,
+    title: "Your decision<br>is ready.",
+    dek: `Hi ${esc(first(name))}, thank you for applying.`,
+    body, reason: "You're receiving this because you applied to Vanderbilt Greenlight.",
+  });
+  const text = `Your decision is ready\n\nHi ${first(name)},\n\nThank you for your patience while the board reviewed applications for ${program}. A decision letter about your application has been posted.\n\nConfirmation number: ${ref}\nView your decision: ${link}\n\nEnter your confirmation number on that page to read your letter.${textFooter(base)}`;
+  return { subject: `Your application decision is ready · ${ref}`, preheader: "", html, text };
+}

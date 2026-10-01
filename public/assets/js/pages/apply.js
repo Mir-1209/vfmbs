@@ -222,6 +222,7 @@ V.ready.then(async (C) => {
         <h2 class="h2">That's a wrap${name ? ", " + esc(name) : ""}.</h2>
         <p style="color:var(--muted);max-width:540px;margin:0 auto 10px">Your application is in the screening room. Confirmation <b style="color:var(--gold);font-family:var(--mono)">${esc(rec.id)}</b>${V.live ? ". We've emailed you a copy" : ""}.</p>
         <p><span class="status-pill ${/Accepted|Interview/.test(status) ? "st-good" : /Not selected/.test(status) ? "st-bad" : /Waitlist/.test(status) ? "st-wait" : "st-review"}">${esc(status)}</span></p>
+        ${/Accepted|Waitlist|Not selected/.test(status) ? `<p><a class="btn btn-gold btn-sm" href="/decision?code=${encodeURIComponent(rec.id)}">Read your decision letter</a></p>` : ""}
         <div class="progress-steps" style="max-width:440px;margin:24px auto 6px">${[0, 1, 2, 3].map((i) => `<i class="${i <= stageIdx ? "on" : ""}"></i>`).join("")}</div>
         <div style="display:flex;justify-content:space-between;max-width:440px;margin:0 auto 34px" class="mono"><span>Submitted</span><span>Interview</span><span>Decision</span><span>Offer</span></div>
         <div style="text-align:left;border-top:1px solid var(--line);padding-top:28px">

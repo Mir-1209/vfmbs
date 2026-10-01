@@ -11,6 +11,7 @@ import { str, email, list, url, oneOf, isBot } from "./_lib/validate.js";
 import { loadContent } from "./_lib/content.js";
 import { sendEmail, siteUrl } from "./_lib/email.js";
 import { applicationEmail } from "./_lib/templates.js";
+import { decisionVisible } from "./_lib/decision.js";
 
 const YEARS = ["2027", "2028", "2029", "2030", "Graduate"];
 
@@ -21,7 +22,7 @@ async function slotsFor(content) {
 }
 
 function publicStatus(app, content) {
-  const release = content.settings?.releaseDecisions;
+  const release = decisionVisible(app, content.settings || {});
   const s = app.status || "submitted";
   const map = { submitted: "In review", reviewing: "In review", interview: "Interview stage", accepted: release ? "Accepted" : "In review", waitlisted: release ? "Waitlisted" : "In review", declined: release ? "Not selected" : "In review" };
   return map[s] || "In review";
@@ -110,6 +111,6 @@ export default handler(async (req, res) => {
   const token = signId("app", id);
 
   const mail = applicationEmail({ base: siteUrl(req), app, id, token, tracks: content.tracks || [], s });
-  await sendEmail({ to: app.email, subject: mail.subject, html: mail.html, text: mail.text });
+  await sendEmail({ to: app.email, subject: mail.subject, html: mail.html, text: mail.text, kind: "application" });
   send(res, 200, { id, token });
 });

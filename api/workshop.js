@@ -7,6 +7,7 @@ import { str, email, isBot } from "./_lib/validate.js";
 import { loadContent, findWorkshop } from "./_lib/content.js";
 import { sendEmail, siteUrl } from "./_lib/email.js";
 import { workshopEmail } from "./_lib/templates.js";
+import { FINAL, decisionVisible } from "./_lib/decision.js";
 
 export default handler(async (req, res) => {
   allow(req, ["GET", "POST"]);
@@ -20,8 +21,7 @@ export default handler(async (req, res) => {
     const [wsId] = code.split(":");
     const app = parse(await cmd("HGET", `${P}wsapps:${wsId}`, code));
     if (!app) throw new HttpError(404, "Application not found.");
-    const release = content.settings?.releaseDecisions;
-    const status = ["accepted", "waitlisted", "declined"].includes(app.status) && !release ? "review" : app.status;
+    const status = FINAL.includes(app.status) && !decisionVisible(app, content.settings || {}) ? "review" : app.status;
     return send(res, 200, { status });
   }
 
@@ -46,7 +46,8 @@ export default handler(async (req, res) => {
   if (!claimed) throw new HttpError(409, "You've already applied to this workshop.");
   const code = `${ws.id}:${randomCode(6)}`;
   await cmd("HSET", `${P}wsapps:${ws.id}`, code, JSON.stringify({ ...app, code }));
+  await cmd("SET", `${P}wscode:${code.split(":")[1]}`, code);
   const mail = workshopEmail({ base: siteUrl(req), ws, app, code: code.split(":")[1], s: content.settings || {} });
-  await sendEmail({ to: app.email, subject: mail.subject, html: mail.html, text: mail.text });
+  await sendEmail({ to: app.email, subject: mail.subject, html: mail.html, text: mail.text, kind: "workshop-application" });
   send(res, 200, { code: code.split(":")[1], token: signId("ws", code) });
 });

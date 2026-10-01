@@ -29,7 +29,7 @@ export default handler(async (req, res) => {
   if (process.env.NOTIFY_EMAIL) {
     const s = (await loadContent(req).catch(() => ({}))).settings || {};
     const mail = contactEmail({ base: siteUrl(req), msg, s });
-    await sendEmail({ to: process.env.NOTIFY_EMAIL, replyTo: msg.email, subject: mail.subject, html: mail.html, text: mail.text });
+    await sendEmail({ to: process.env.NOTIFY_EMAIL, replyTo: msg.email, subject: mail.subject, html: mail.html, text: mail.text, kind: "board-notification" });
   }
   send(res, 200, { ok: true });
 });

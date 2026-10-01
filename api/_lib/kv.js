@@ -45,6 +45,7 @@ function mockExec([c, ...a]) {
     case "HSETNX": { db.h[k] = db.h[k] || {}; if (a[1] in db.h[k]) return 0; db.h[k][a[1]] = String(a[2]); persist(); return 1; }
     case "HGET": return db.h[k]?.[a[1]] ?? null;
     case "HDEL": { let n = 0; for (const f of a.slice(1)) if (db.h[k] && f in db.h[k]) { delete db.h[k][f]; n++; } persist(); return n; }
+    case "HEXISTS": return db.h[k] && a[1] in db.h[k] ? 1 : 0;
     case "HGETALL": return Object.entries(db.h[k] || {}).flat();
     case "HLEN": return Object.keys(db.h[k] || {}).length;
     case "HINCRBY": { db.h[k] = db.h[k] || {}; db.h[k][a[1]] = String(Number(db.h[k][a[1]] || 0) + Number(a[2])); persist(); return Number(db.h[k][a[1]]); }
@@ -53,6 +54,12 @@ function mockExec([c, ...a]) {
     case "LTRIM": { const l = db.l[k] || []; const e = Number(a[2]); db.l[k] = l.slice(Number(a[1]), e < 0 ? l.length + e + 1 : e + 1); persist(); return "OK"; }
     case "LINDEX": return (db.l[k] || [])[Number(a[1])] ?? null;
     case "PING": return "PONG";
+    case "SCAN": {
+      const mi = a.findIndex((x) => String(x).toUpperCase() === "MATCH");
+      const re = new RegExp("^" + String(mi >= 0 ? a[mi + 1] : "*").replace(/[.+?^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*") + "$");
+      const keys = [...new Set([...Object.keys(db.s), ...Object.keys(db.h), ...Object.keys(db.l)])].filter((x) => re.test(x));
+      return ["0", keys];
+    }
     default: throw new Error("Mock KV: unsupported command " + c);
   }
 }
@@ -86,4 +93,16 @@ export async function hgetallJSON(key) {
   for (const k in o) o[k] = parse(o[k], o[k]);
   return o;
 }
+// Iterate all keys matching a pattern (pattern is relative to the vfmbs: prefix).
+export async function scanKeys(pattern) {
+  const out = [];
+  let cursor = "0";
+  do {
+    const [next, keys] = await cmd("SCAN", cursor, "MATCH", P + pattern, "COUNT", 500);
+    out.push(...keys);
+    cursor = String(next);
+  } while (cursor !== "0");
+  return [...new Set(out)];
+}
+
 export async function getContent() { return getJSON("content", null); }

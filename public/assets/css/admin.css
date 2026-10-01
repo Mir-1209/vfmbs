@@ -235,3 +235,29 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
 .em-frame { background: #000; border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; justify-content: center; overflow: auto; }
 .em-frame iframe { border: 0; background: #050505; height: 1400px; max-width: 100%; transition: width 0.3s var(--ease); }
 @media (max-width: 1000px) { .em-wrap { grid-template-columns: 1fr; } .em-list { position: static; } }
+
+/* Decision emails */
+.notify-row { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; margin: 0 0 18px; border: 1px solid rgba(207,174,112,.35); background: rgba(207,174,112,.06); border-radius: 12px; cursor: pointer; }
+.notify-row[hidden] { display: none; }
+.notify-row input { margin-top: 3px; accent-color: var(--gold); width: 16px; height: 16px; }
+.notify-row b { display: block; color: #fff; font-size: 14px; }
+.notify-row small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 3px; line-height: 1.5; }
+
+/* Archive & clear */
+.arch-kpis { grid-template-columns: repeat(3, 1fr); margin-bottom: 0; }
+.arch-kpis .kpi small { position: static; display: block; margin-top: 6px; color: var(--muted); font-size: 12px; }
+.arch-flow { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 8px; }
+.arch-step { display: grid; grid-template-columns: 34px 1fr; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); transition: opacity .2s; }
+.arch-step:last-child { border-bottom: 0; }
+.arch-step.off { opacity: .35; pointer-events: none; }
+.arch-step .n { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--gold); color: var(--gold); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; font-weight: 700; }
+.arch-step.done .n { background: var(--gold); color: #111; }
+.arch-step b { color: #fff; }
+.arch-step .help { margin: 4px 0 12px; }
+.arch-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 18px; margin: 12px 0 6px; font-size: 14px; }
+.arch-checks label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.arch-checks label.sub { grid-column: 1 / -1; color: var(--muted); font-size: 13px; }
+.arch-checks input { accent-color: var(--gold); }
+.danger-btn { background: #c0262f; color: #fff; border: 1px solid #c0262f; }
+.danger-btn:disabled { opacity: .4; cursor: not-allowed; }
+@media (max-width: 760px) { .arch-kpis, .arch-checks { grid-template-columns: 1fr; } }

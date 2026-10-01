@@ -145,7 +145,7 @@
     if (!G) { cv.remove(); return null; }
     document.documentElement.classList.add("has-film");
     const isSafari = /^((?!chrome|chromium|android|crios|fxios).)*safari/i.test(navigator.userAgent);
-    const st = { burn: 0, bo: [0.5, 0.5], amt: isSafari ? 0.7 : 1, flick: 0, last: 0 };
+    const st = { burn: 0, bo: [0.5, 0.5], amt: page === "decision" ? 0.3 : isSafari ? 0.7 : 1, flick: 0, last: 0 };
     const t0 = performance.now();
     const frame = (now) => {
       requestAnimationFrame(frame);

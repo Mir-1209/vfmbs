@@ -14,8 +14,23 @@ export function siteUrl(req) {
   return `${proto}://${host}`;
 }
 
-export async function sendEmail({ to, subject, html, text, replyTo }) {
-  if (!emailEnabled() || !to) return false;
+import { cmd, P, hasKV } from "./kv.js";
+
+// Every email attempt is logged (who, what, result) so it appears in the archive export.
+async function logEmail(entry) {
+  if (!hasKV()) return;
+  try { await cmd("LPUSH", P + "emaillog", JSON.stringify({ ts: Date.now(), ...entry })); await cmd("LTRIM", P + "emaillog", 0, 9999); } catch {}
+}
+
+export async function sendEmail({ to, subject, html, text, replyTo, kind = "other" }) {
+  if (!to) return false;
+  if (!emailEnabled()) { await logEmail({ to, subject, kind, status: "not sent (email not connected)" }); return false; }
+  const ok = await deliver({ to, subject, html, text, replyTo });
+  await logEmail({ to, subject, kind, status: ok ? "sent" : "failed" });
+  return ok;
+}
+
+async function deliver({ to, subject, html, text, replyTo }) {
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 4000);

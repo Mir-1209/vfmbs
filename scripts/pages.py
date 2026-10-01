@@ -405,6 +405,10 @@ pages["ticket.html"] = head("Your Ticket · Greenlight", "Your Greenlight event 
 <body data-page="ticket">
 <main id="main" class="ticket-page"><div class="inner" id="ticket-host"><p class="mono center">Loading your ticket…</p></div></main>''' + scripts("ticket")
 
+pages["decision.html"] = head("Application Decision · Greenlight", "Enter your confirmation number to read the decision letter for your Vanderbilt Greenlight application.", "/decision", '<meta name="robots" content="noindex">\n') + '''
+<body data-page="decision">
+<main id="main" class="decision-page"><div class="inner" id="decision-host"></div></main>''' + scripts("decision")
+
 pages["404.html"] = head("Scene Missing · Greenlight", "This page ended up on the cutting room floor.", "/404", '<meta name="robots" content="noindex">\n') + '''
 <body data-page="404">
 <main id="main" class="nf">

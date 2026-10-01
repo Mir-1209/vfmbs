@@ -182,7 +182,7 @@
   const SETTINGS = [
     { legend: "Announcement bar", fields: [{ k: "announcement.enabled", t: "toggle", label: "Show announcement bar at top of every page" }, { k: "announcement.text", t: "text", label: "Message" }, { row: [{ k: "announcement.label", t: "text", label: "Link text" }, { k: "announcement.link", t: "text", label: "Link", help: "/apply or https://…" }] }] },
     { legend: "Recruiting", fields: [
-      { row: [{ k: "applicationsOpen", t: "toggle", label: "Applications open" }, { k: "releaseDecisions", t: "toggle", label: "Show decisions to applicants", help: "When off, applicants only see “In review” until you release decisions." }] },
+      { row: [{ k: "applicationsOpen", t: "toggle", label: "Applications open" }, { k: "releaseDecisions", t: "toggle", label: "Release all decisions now", help: "Normally a decision is shown only after you email that applicant. Turn this on to show every final decision on /decision and My Studio without emailing." }] },
       { k: "applicationDeadline", t: "datetime", label: "Application deadline (Central Time)" },
       { k: "timeline", t: "objects", label: "Recruitment timeline", noun: "milestone", blank: () => ({ label: "Milestone", date: inWeek(12) }), fields: [{ row: [{ k: "label", t: "text", label: "Label" }, { k: "date", t: "datetime", label: "Date" }] }] },
       { k: "interviewSlots", t: "slots", label: "Interview slots (Central Time)" },
@@ -194,6 +194,12 @@
       { row: [{ k: "season", t: "text", label: "Current season", help: "e.g. Fall 2026" }, { k: "issue", t: "text", label: "Journal issue", help: "e.g. Vol. 04" }] },
       { row: [{ k: "email", t: "text", label: "Public email" }, { k: "sponsorEmail", t: "text", label: "Partnerships email" }] },
       { k: "location", t: "text", label: "Location line" },
+    ] },
+    { legend: "Decision letters", intro: "When you set an application to Accepted, Waitlisted or Declined and choose “Email the applicant”, they get a short email saying their decision is ready. They open /decision, type their confirmation number, and read this letter (with confetti if accepted). Leave a letter empty to use the standard text shown in grey. You can write {first} for their first name and {program} for the program they applied to.", fields: [
+      { k: "decisionLetters.accepted", t: "textarea", rows: 9, label: "Accepted", ph: () => (S.letterDefaults || {}).accepted || "" },
+      { k: "decisionLetters.waitlisted", t: "textarea", rows: 8, label: "Waitlisted", ph: () => (S.letterDefaults || {}).waitlisted || "" },
+      { k: "decisionLetters.declined", t: "textarea", rows: 9, label: "Declined", ph: () => (S.letterDefaults || {}).declined || "" },
+      { row: [{ k: "decisionSigner", t: "text", label: "Signed by", help: "e.g. Jane Doe, or leave empty for “The Board of Vanderbilt Greenlight”" }, { k: "decisionSignerTitle", t: "text", label: "Signer title", help: "e.g. President, Vanderbilt Greenlight" }] },
     ] },
     { legend: "Social links", fields: [{ row: [{ k: "instagram", t: "url", label: "Instagram" }, { k: "linkedin", t: "url", label: "LinkedIn" }] }, { row: [{ k: "tiktok", t: "url", label: "TikTok" }, { k: "youtube", t: "url", label: "YouTube" }] }] },
   ];
@@ -233,7 +239,7 @@
           break;
         }
         case "textarea":
-          w.innerHTML = `${label}<textarea class="textarea" id="${id}" rows="${f.rows || 4}" style="min-height:${(f.rows || 4) * 24}px">${esc(val ?? "")}</textarea>${help}`;
+          w.innerHTML = `${label}<textarea class="textarea" id="${id}" rows="${f.rows || 4}" style="min-height:${(f.rows || 4) * 24}px"${f.ph ? ` placeholder="${esc(typeof f.ph === "function" ? f.ph() : f.ph)}"` : ""}>${esc(val ?? "")}</textarea>${help}`;
           $("textarea", w).addEventListener("input", (e) => change(e.target.value));
           break;
         case "select": case "tz": {
@@ -488,7 +494,7 @@
     ["Overview", [["dashboard", "Dashboard", ic.dash], ["checkin", "Check-in", ic.scan]]],
     ["People", [["rsvps", "RSVPs", ic.ticket], ["applications", "Applications", ic.apps], ["wsapps", "Workshop apps", ic.ws], ["inbox", "Inbox", ic.inbox], ["subscribers", "Subscribers", ic.subs]]],
     ["Content", [["events", "Events", ic.cal], ["workshops", "Workshops", ic.ws], ["posts", "Journal", ic.pen], ["team", "Team", ic.users], ["partners", "Partners", ic.hand], ["tracks", "Tracks", ic.tracks]]],
-    ["Site", [["homepage", "Homepage", ic.home], ["settings", "Settings", ic.gear], ["emails", "Emails", ic.mail], ["versions", "Versions & backup", ic.hist]]],
+    ["Site", [["homepage", "Homepage", ic.home], ["settings", "Settings", ic.gear], ["emails", "Emails", ic.mail], ["archive", "Archive & clear", ic.download], ["versions", "Versions & backup", ic.hist]]],
   ];
   const TITLES = Object.fromEntries(NAV.flatMap(([, it]) => it.map(([k, l]) => [k, l])));
 
@@ -551,9 +557,9 @@
     const v = $("#view");
     v.innerHTML = "";
     scrollTo(0, 0);
-    const people = ["rsvps", "applications", "wsapps", "inbox", "subscribers", "checkin", "emails"];
+    const people = ["rsvps", "applications", "wsapps", "inbox", "subscribers", "checkin", "emails", "archive"];
     if (people.includes(S.view) && !live()) return v.append(needDB());
-    ({ dashboard, checkin, rsvps, applications, wsapps, inbox, subscribers, homepage, settings, versions, emails }[S.view] || collection)(v, S.view);
+    ({ dashboard, checkin, rsvps, applications, wsapps, inbox, subscribers, homepage, settings, versions, emails, archive }[S.view] || collection)(v, S.view);
   }
   function needDB() {
     const d = document.createElement("div");
@@ -686,7 +692,7 @@
     SETTINGS.forEach((g) => {
       const box = document.createElement("div");
       box.className = "box";
-      box.innerHTML = `<h2>${esc(g.legend)}</h2>`;
+      box.innerHTML = `<h2>${esc(g.legend)}</h2>${g.intro ? `<p class="help" style="margin:-4px 0 16px;max-width:760px">${esc(g.intro)}</p>` : ""}`;
       renderFields(box, g.fields, S.content.settings, changed);
       v.append(box);
     });
@@ -894,9 +900,23 @@
   const APP_ST = [["submitted", "Submitted", ""], ["reviewing", "Reviewing", "warn"], ["interview", "Interview", "gold"], ["accepted", "Accepted", "ok"], ["waitlisted", "Waitlisted", "warn"], ["declined", "Declined", "bad"]];
   const stPill = (s) => { const x = APP_ST.find((a) => a[0] === s) || APP_ST[0]; return `<span class="pill ${x[2]}">${x[1]}</span>`; };
   const tn = (id) => (S.content.tracks.find((t) => t.id === id) || {}).name || id;
+  const FINAL = ["accepted", "waitlisted", "declined"];
+  const notifyDue = (a) => FINAL.includes(a.status) && a.notifiedStatus !== a.status;
+  const notifyNote = (a) => !FINAL.includes(a.status) ? "" : a.notifiedStatus === a.status ? `<div class="help nowrap" title="${esc(a.notifyEmail || "")}">✓ Letter released ${a.notifiedAt ? ago(a.notifiedAt) : ""}</div>` : `<div class="help nowrap" style="color:var(--gold)">Not emailed yet</div>`;
+  async function notifyAll(kind, apps, redraw) {
+    const n = apps.filter(notifyDue).length;
+    if (!n) return toast("Everyone with a decision has already been emailed.");
+    if (!confirm(`Email ${n} applicant${n === 1 ? "" : "s"} that their decision is ready?\n\nThe email doesn't reveal the outcome. They'll read their letter at /decision with their confirmation number.`)) return;
+    try {
+      const r = await api("notifyall", { kind });
+      apps.filter(notifyDue).slice(0, r.released).forEach((a) => { a.notifiedStatus = a.status; a.notifiedAt = Date.now(); });
+      toast(`${r.released} letter${r.released === 1 ? "" : "s"} released${r.sent < r.released ? ` (${r.released - r.sent} email${r.released - r.sent === 1 ? "" : "s"} not delivered: check Emails)` : ""}${r.remaining ? `. ${r.remaining} left: click again` : ""}`);
+      redraw();
+    } catch (e) { fail(e); }
+  }
   async function applications(v) {
     v.innerHTML = `
-      <div class="tbl-tools"><input class="input" type="search" id="aq" placeholder="Search applicants…"><select class="select" id="ast"><option value="">All statuses</option>${APP_ST.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select><select class="select" id="atr"><option value="">All tracks</option>${S.content.tracks.map((t) => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("")}</select><span class="grow"></span><button class="btn btn-outline btn-sm" id="acsv">${ic.download} Export CSV</button></div>
+      <div class="tbl-tools"><input class="input" type="search" id="aq" placeholder="Search applicants…"><select class="select" id="ast"><option value="">All statuses</option>${APP_ST.map(([k, l]) => `<option value="${k}">${l}</option>`).join("")}</select><select class="select" id="atr"><option value="">All tracks</option>${S.content.tracks.map((t) => `<option value="${esc(t.id)}">${esc(t.name)}</option>`).join("")}</select><span class="grow"></span><button class="btn btn-outline btn-sm" id="anotify">${ic.mail} Email decided applicants</button><button class="btn btn-outline btn-sm" id="acsv">${ic.download} Export CSV</button></div>
       <div id="at">Loading…</div>`;
     let apps = [];
     try { apps = (await api("apps")).apps; } catch (e) { fail(e); }
@@ -904,13 +924,14 @@
     const draw = () => {
       const rows = apps.filter((a) => (!f.st || a.status === f.st) && (!f.tr || (a.tracks || []).includes(f.tr)) && (!f.q || JSON.stringify(a).toLowerCase().includes(f.q)));
       $("#at").innerHTML = rows.length ? `<div class="tbl-wrap"><table class="tbl"><tr><th>Applicant</th><th>Year</th><th>Tracks</th><th>Status</th><th>Rating</th><th>Interview</th><th>Submitted</th></tr>${rows.map((a) => `
-        <tr class="click" data-id="${esc(a.id)}"><td><b>${esc(a.name)}</b><div class="help">${esc(a.email)} · ${esc(a.id)}</div></td><td>${esc(a.year)}</td><td class="muted">${esc((a.tracks || []).map(tn).join(" → "))}</td><td>${stPill(a.status)}</td><td style="color:var(--gold)">${"★".repeat(a.rating || 0)}<span style="color:#333">${"★".repeat(5 - (a.rating || 0))}</span></td><td class="nowrap">${a.interview ? fmtDT(a.interview) : '<span class="muted">—</span>'}</td><td class="muted nowrap">${ago(a.ts)}</td></tr>`).join("")}</table></div>` : `<div class="empty-s">No applications${apps.length ? " match these filters" : " yet"}.</div>`;
+        <tr class="click" data-id="${esc(a.id)}"><td><b>${esc(a.name)}</b><div class="help">${esc(a.email)} · ${esc(a.id)}</div></td><td>${esc(a.year)}</td><td class="muted">${esc((a.tracks || []).map(tn).join(" → "))}</td><td>${stPill(a.status)}${notifyNote(a)}</td><td style="color:var(--gold)">${"★".repeat(a.rating || 0)}<span style="color:#333">${"★".repeat(5 - (a.rating || 0))}</span></td><td class="nowrap">${a.interview ? fmtDT(a.interview) : '<span class="muted">—</span>'}</td><td class="muted nowrap">${ago(a.ts)}</td></tr>`).join("")}</table></div>` : `<div class="empty-s">No applications${apps.length ? " match these filters" : " yet"}.</div>`;
       $$("tr[data-id]", v).forEach((tr) => tr.addEventListener("click", () => openApp(apps.find((a) => a.id === tr.dataset.id), draw, () => { apps = apps.filter((a) => a.id !== tr.dataset.id); draw(); })));
     };
     $("#aq").addEventListener("input", (e) => { f.q = e.target.value.toLowerCase(); draw(); });
     $("#ast").addEventListener("change", (e) => { f.st = e.target.value; draw(); });
+    $("#anotify").addEventListener("click", () => notifyAll("membership", apps, draw));
     $("#atr").addEventListener("change", (e) => { f.tr = e.target.value; draw(); });
-    $("#acsv").addEventListener("click", () => csv(apps, [["id", "ID"], ["name", "Name"], ["pref", "Preferred"], ["email", "Email"], ["phone", "Phone"], ["year", "Year"], ["major", "Major"], [(a) => (a.tracks || []).map(tn), "Tracks"], ["areas", "Areas"], ["finexp", "Finance exp."], ["heard", "Heard via"], ["status", "Status"], ["rating", "Rating"], [(a) => (a.interview ? new Date(a.interview).toLocaleString() : ""), "Interview"], ["why", "Why Greenlight"], ["pitch", "Pitch"], ["news", "Story"], ["resume", "Resume"], ["linkedin", "LinkedIn"], ["notes", "Notes"], [(a) => new Date(a.ts).toLocaleString(), "Submitted"]], "applications"));
+    $("#acsv").addEventListener("click", () => csv(apps, [["id", "ID"], ["name", "Name"], ["pref", "Preferred"], ["email", "Email"], ["phone", "Phone"], ["year", "Year"], ["major", "Major"], [(a) => (a.tracks || []).map(tn), "Tracks"], ["areas", "Areas"], ["finexp", "Finance exp."], ["heard", "Heard via"], ["status", "Status"], ["rating", "Rating"], [(a) => (a.interview ? new Date(a.interview).toLocaleString() : ""), "Interview"], ["why", "Why Greenlight"], ["pitch", "Pitch"], ["news", "Story"], ["resume", "Resume"], ["linkedin", "LinkedIn"], ["notes", "Notes"], [(a) => new Date(a.ts).toLocaleString(), "Submitted"], [(a) => (a.notifiedAt ? new Date(a.notifiedAt).toLocaleString() : ""), "Decision emailed"]], "applications"));
     draw();
   }
   function openApp(a, redraw, onDelete) {
@@ -935,18 +956,29 @@
         <div class="qa"><span>Pitch</span><p>${esc(a.pitch)}</p></div>
         <div class="qa"><span>Industry story</span><p>${esc(a.news)}</p></div>
         <div class="quick" style="margin-bottom:18px">${safe(a.resume) ? `<a class="btn btn-outline btn-sm" href="${esc(safe(a.resume))}" target="_blank" rel="noopener noreferrer">${ic.ext} Resume</a>` : ""}${safe(a.linkedin) ? `<a class="btn btn-outline btn-sm" href="${esc(safe(a.linkedin))}" target="_blank" rel="noopener noreferrer">${ic.ext} LinkedIn</a>` : ""}</div>
+        <label class="notify-row" id="ap-nrow"><input type="checkbox" id="ap-notify"><span><b>Email the applicant that their decision is ready</b><small id="ap-nhelp"></small></span></label>
         <div class="field"><label for="ap-notes">Reviewer notes (private)</label><textarea class="textarea" id="ap-notes" rows="5">${esc(a.notes || "")}</textarea></div>
         <p class="help">${esc(a.id)} · submitted ${new Date(a.ts).toLocaleString()} · heard via ${esc(a.heard || "—")}</p>
       </div>
       <div class="drawer-foot"><button class="btn btn-outline btn-sm" id="ap-del">${ic.trash} Delete</button><span style="flex:1"></span><button class="btn btn-gold btn-sm" id="ap-save">${ic.check} Save</button></div>`;
     let rating = a.rating || 0;
+    const syncNotify = () => {
+      const st = $("#ap-st", d).value, fin = FINAL.includes(st), sent = a.notifiedStatus === st;
+      $("#ap-nrow", d).hidden = !fin;
+      $("#ap-notify", d).checked = fin && !sent;
+      $("#ap-nhelp", d).textContent = sent ? `Already emailed about this decision ${a.notifiedAt ? new Date(a.notifiedAt).toLocaleString() : ""}. Tick to send it again.` : `They'll get a short email and read the ${st} letter at /decision with ${a.id}. Until then they see “In review”.`;
+    };
+    $("#ap-st", d).addEventListener("change", syncNotify);
+    syncNotify();
     $$("#ap-stars button", d).forEach((b) => b.addEventListener("click", () => { rating = +b.dataset.n === rating ? 0 : +b.dataset.n; $$("#ap-stars button", d).forEach((x) => x.classList.toggle("on", +x.dataset.n <= rating)); }));
     $("#dclose", d).addEventListener("click", closeDrawer);
     $("#ap-save", d).addEventListener("click", async () => {
       try {
-        const r = await api("app", { id: a.id, status: $("#ap-st", d).value, notes: $("#ap-notes", d).value, rating });
+        const notify = !$("#ap-nrow", d).hidden && $("#ap-notify", d).checked;
+        const r = await api("app", { id: a.id, status: $("#ap-st", d).value, notes: $("#ap-notes", d).value, rating, notify });
         Object.assign(a, r.app);
-        toast("Saved"); closeDrawer(); redraw(); refreshCounts();
+        toast(!notify ? "Saved" : r.emailed ? "Saved. Decision email sent" : "Saved. Letter released, but the email wasn't sent (see Emails)", notify && !r.emailed ? "error" : "");
+        closeDrawer(); redraw(); refreshCounts();
       } catch (e) { fail(e); }
     });
     $("#ap-del", d).addEventListener("click", async () => {
@@ -961,7 +993,7 @@
      WORKSHOP APPS · INBOX · SUBSCRIBERS
      ===================================================================== */
   async function wsapps(v) {
-    v.innerHTML = `<div class="tbl-tools"><select class="select" id="wsw"><option value="">All workshops</option>${(S.content.workshops || []).map((w) => `<option value="${esc(w.id)}">${esc(w.title)}</option>`).join("")}</select><select class="select" id="wss"><option value="">All statuses</option><option value="review">In review</option><option value="accepted">Accepted</option><option value="waitlisted">Waitlisted</option><option value="declined">Declined</option></select><span class="grow"></span><button class="btn btn-outline btn-sm" id="wcopy">${ic.copy} Copy accepted emails</button><button class="btn btn-outline btn-sm" id="wcsv">${ic.download} Export CSV</button></div><div id="wt">Loading…</div>`;
+    v.innerHTML = `<div class="tbl-tools"><select class="select" id="wsw"><option value="">All workshops</option>${(S.content.workshops || []).map((w) => `<option value="${esc(w.id)}">${esc(w.title)}</option>`).join("")}</select><select class="select" id="wss"><option value="">All statuses</option><option value="review">In review</option><option value="accepted">Accepted</option><option value="waitlisted">Waitlisted</option><option value="declined">Declined</option></select><span class="grow"></span><button class="btn btn-outline btn-sm" id="wnotify">${ic.mail} Email decided applicants</button><button class="btn btn-outline btn-sm" id="wcopy">${ic.copy} Copy accepted emails</button><button class="btn btn-outline btn-sm" id="wcsv">${ic.download} Export CSV</button></div><div id="wt">Loading…</div>`;
     let apps = [];
     try { apps = (await api("wsapps")).apps; } catch (e) { fail(e); }
     const f = { w: "", s: "" };
@@ -969,11 +1001,26 @@
       const rows = apps.filter((a) => (!f.w || a.workshopId === f.w) && (!f.s || a.status === f.s));
       $("#wt").innerHTML = rows.length ? `<div class="tbl-wrap"><table class="tbl"><tr><th>Applicant</th><th>Workshop</th><th>Year · Major</th><th>Experience</th><th>Why</th><th>Status</th><th></th></tr>${rows.map((a) => `
         <tr><td><b>${esc(a.name)}</b><div class="help">${esc(a.email)}</div></td><td>${esc(a.workshop)}</td><td class="muted">${esc(a.year)} · ${esc(a.major)}</td><td class="muted">${esc(a.exp)}</td><td class="muted" style="max-width:300px">${esc(a.why)}</td>
-        <td><select class="select" data-st="${esc(a.code)}" style="padding:6px 30px 6px 10px;font-size:12px">${["review", "accepted", "waitlisted", "declined"].map((s) => `<option ${a.status === s ? "selected" : ""} value="${s}">${s[0].toUpperCase() + s.slice(1)}</option>`).join("")}</select></td>
+        <td><select class="select" data-st="${esc(a.code)}" style="padding:6px 30px 6px 10px;font-size:12px">${["review", "accepted", "waitlisted", "declined"].map((s) => `<option ${a.status === s ? "selected" : ""} value="${s}">${s[0].toUpperCase() + s.slice(1)}</option>`).join("")}</select>${notifyNote(a)}${notifyDue(a) ? `<button class="btn btn-outline btn-sm" data-notify="${esc(a.code)}" style="margin-top:6px;height:28px">${ic.mail} Email decision</button>` : ""}</td>
         <td><button class="ib danger" data-del="${esc(a.code)}" title="Delete">${ic.trash}</button></td></tr>`).join("")}</table></div>` : `<div class="empty-s">No workshop applications${apps.length ? " match" : " yet"}.</div>`;
       $$("[data-st]", v).forEach((s) => s.addEventListener("change", async () => {
         const a = apps.find((x) => x.code === s.dataset.st);
-        try { await api("wsapp", { workshopId: a.workshopId, code: a.code, status: s.value }); a.status = s.value; toast("Status updated"); } catch (e) { fail(e); }
+        const notify = FINAL.includes(s.value) && confirm(`Email ${a.name} that their decision is ready?\n\nOK = save and email now · Cancel = just save (you can email later)`);
+        try {
+          const r = await api("wsapp", { workshopId: a.workshopId, code: a.code, status: s.value, notify });
+          Object.assign(a, r.app, { code: a.code });
+          toast(!notify ? "Status updated" : r.emailed ? "Status updated. Decision email sent" : "Letter released, but the email wasn't sent (see Emails)", notify && !r.emailed ? "error" : "");
+          draw();
+        } catch (e) { fail(e); }
+      }));
+      $$("[data-notify]", v).forEach((b) => b.addEventListener("click", async () => {
+        const a = apps.find((x) => x.code === b.dataset.notify);
+        try {
+          const r = await api("wsapp", { workshopId: a.workshopId, code: a.code, notify: true });
+          Object.assign(a, r.app, { code: a.code });
+          toast(r.emailed ? "Decision email sent" : "Letter released, but the email wasn't sent (see Emails)", r.emailed ? "" : "error");
+          draw();
+        } catch (e) { fail(e); }
       }));
       $$("[data-del]", v).forEach((b) => b.addEventListener("click", async () => {
         const a = apps.find((x) => x.code === b.dataset.del);
@@ -983,8 +1030,9 @@
     };
     $("#wsw").addEventListener("change", (e) => { f.w = e.target.value; draw(); });
     $("#wss").addEventListener("change", (e) => { f.s = e.target.value; draw(); });
+    $("#wnotify").addEventListener("click", () => notifyAll("workshop", apps, draw));
     $("#wcopy").addEventListener("click", () => copy(apps.filter((a) => a.status === "accepted" && (!f.w || a.workshopId === f.w)).map((a) => a.email).join(", "), "Emails copied"));
-    $("#wcsv").addEventListener("click", () => csv(apps, [["workshop", "Workshop"], ["name", "Name"], ["email", "Email"], ["year", "Year"], ["major", "Major"], ["exp", "Experience"], ["why", "Why"], ["status", "Status"], [(a) => new Date(a.ts).toLocaleString(), "Submitted"]], "workshop-applications"));
+    $("#wcsv").addEventListener("click", () => csv(apps, [["workshop", "Workshop"], ["name", "Name"], ["email", "Email"], ["year", "Year"], ["major", "Major"], ["exp", "Experience"], ["why", "Why"], ["status", "Status"], [(a) => new Date(a.ts).toLocaleString(), "Submitted"], [(a) => (a.code || "").split(":").pop(), "Confirmation"], [(a) => (a.notifiedAt ? new Date(a.notifiedAt).toLocaleString() : ""), "Decision emailed"]], "workshop-applications"));
     draw();
   }
 
@@ -1029,8 +1077,84 @@
   /* =====================================================================
      EMAILS: previews of every automatic email + send a test
      ===================================================================== */
+  /* =====================================================================
+     ARCHIVE & CLEAR (download everything as one CSV, then free up the database)
+     ===================================================================== */
+  const day = (ts) => (ts ? new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "");
+  const iso = (ts) => (ts ? new Date(ts).toISOString().replace("T", " ").slice(0, 19) + " UTC" : "");
+  function archiveRows(d) {
+    const T = (v) => (typeof v === "number" && v > 1e12 ? iso(v) : v);
+    const rows = [];
+    const add = (type, base, rest = {}) => {
+      const r = { "Record type": type, ...base };
+      for (const [k, v] of Object.entries(rest)) if (!(k in r) && v !== undefined && v !== null && v !== "") r[k] = Array.isArray(v) ? v.join("; ") : typeof v === "object" ? JSON.stringify(v) : T(v);
+      rows.push(r);
+    };
+    const omit = (o, ...ks) => { const c = { ...o }; ks.forEach((k) => delete c[k]); return c; };
+    for (const r of d.rsvps) add(r.waitlist ? "RSVP (waitlist)" : "RSVP", { Date: iso(r.ts), Name: r.name, Email: r.email, "Event / program": r.event, Status: r.checkedIn ? "Checked in" : r.waitlist ? "Waitlist" : "Going", "Code / ID": r.code }, { "Event date": r.eventDate, ...omit(r, "ts", "name", "email", "event", "code", "eventDate", "token", "upcoming") });
+    for (const a of d.apps) add("Membership application", { Date: iso(a.ts), Name: a.name, Email: a.email, "Event / program": "Membership", Status: a.status, "Code / ID": a.id }, { Tracks: (a.tracks || []).map(tn), Interview: a.interview, "Decision emailed": iso(a.notifiedAt), ...omit(a, "ts", "name", "email", "status", "id", "tracks", "interview", "notifiedAt") });
+    for (const a of d.wsapps) add("Workshop application", { Date: iso(a.ts), Name: a.name, Email: a.email, "Event / program": a.workshop, Status: a.status, "Code / ID": a.code }, { "Decision emailed": iso(a.notifiedAt), ...omit(a, "ts", "name", "email", "status", "code", "workshop", "notifiedAt") });
+    for (const m of d.inbox) add("Inbox message", { Date: iso(m.ts), Name: m.name, Email: m.email, "Event / program": m.topic, Status: m.read ? "Read" : "Unread", "Code / ID": m.id }, omit(m, "ts", "name", "email", "topic", "read", "id"));
+    for (const x of d.subs) add("Newsletter subscriber", { Date: iso(x.ts), Email: x.email }, omit(x, "ts", "email"));
+    for (const e of d.emails) add("Email sent", { Date: iso(e.ts), Email: e.to, "Event / program": e.kind, Status: e.status }, { Subject: e.subject });
+    for (const x of d.slots) add("Interview slot booking", { Date: x.slot, "Code / ID": x.id });
+    rows.sort((a, b) => String(a.Date).localeCompare(String(b.Date)));
+    const LABEL = { year: "Class year", major: "Major", areas: "Areas", why: "Why", pitch: "Pitch", news: "Industry story", rating: "Rating", decidedAt: "Decided at", notifiedStatus: "Decision emailed (status)", notifyEmail: "Decision email delivery", workshopId: "Workshop ID", eventId: "Event ID", no: "Ticket no.", waitlist: "Waitlist", interests: "Interests", message: "Message", source: "Source", pref: "Preferred name", phone: "Phone", heard: "Heard via", finexp: "Finance exp.", resume: "Resume", linkedin: "LinkedIn", notes: "Board notes", diet: "Dietary needs", question: "Question", checkedIn: "Checked in at", org: "Organization", exp: "Experience" };
+    const cols = [...new Set(["Record type", "Date", "Name", "Email", "Event / program", "Status", "Code / ID", ...rows.flatMap((r) => Object.keys(r))])];
+    return { rows, cols: cols.map((c) => [c, LABEL[c] || c]) };
+  }
+  async function archive(v) {
+    v.innerHTML = `<div class="box">Loading…</div>`;
+    let d;
+    try { d = await api("archive"); } catch (e) { v.innerHTML = `<div class="empty-s">${esc(e.message)}</div>`; return; }
+    const upcoming = d.rsvps.filter((r) => r.upcoming).length;
+    const counts = [["rsvps", "RSVPs & tickets", d.rsvps.length, upcoming ? `${upcoming} for upcoming events` : ""], ["apps", "Membership applications", d.apps.length, d.slots.length ? `+ ${d.slots.length} interview bookings` : ""], ["ws", "Workshop applications", d.wsapps.length], ["inbox", "Inbox messages", d.inbox.length], ["emails", "Email log", d.emails.length, "who was emailed, what and when"], ["subs", "Newsletter subscribers", d.subs.length]];
+    const total = counts.reduce((a, c) => a + c[2], 0);
+    const period = `${d.from ? day(d.from) : "the beginning"} – ${day(d.to)}`;
+    const fname = `greenlight-archive-${d.from ? new Date(d.from).toISOString().slice(0, 10) : "start"}-to-${new Date(d.to).toISOString().slice(0, 10)}`;
+    const download = () => { const { rows, cols } = archiveRows(d); csv(rows, cols, fname); return rows.length; };
+    v.innerHTML = `
+      <div class="box">
+        <h2>Current period</h2>
+        <p class="help" style="margin:-4px 0 18px;max-width:720px">Everything people have submitted ${d.from ? `since the last clear on <b style="color:#fff">${esc(day(d.from))}</b>` : "since the site went live"}. Download it as one spreadsheet, then clear it to keep the free Upstash database small. Your website content (events, team, settings) is never touched.</p>
+        <div class="kpis arch-kpis">${counts.map(([, l, n, sub]) => `<div class="kpi"><b>${n}</b><span>${esc(l)}</span><small>${esc(sub || "")}</small></div>`).join("")}</div>
+        <div class="quick" style="margin-top:18px"><button class="btn btn-outline btn-sm" id="ar-dl">${ic.download} Download CSV (${total} records)</button><button class="btn btn-gold btn-sm" id="ar-clear" ${total ? "" : "disabled"}>${ic.trash} Clear database…</button></div>
+        <div id="ar-flow"></div>
+      </div>
+      <div class="box"><h2>Past periods</h2>${d.archives.length ? `<div class="tbl-wrap"><table class="tbl"><tr><th>Period</th><th>Cleared on</th><th>What was cleared</th></tr>${d.archives.map((a) => `<tr><td class="nowrap"><b>${a.from ? esc(day(a.from)) : "Start"} – ${esc(day(a.to))}</b></td><td class="muted nowrap">${esc(new Date(a.ts).toLocaleString())}</td><td class="muted">${esc(Object.entries(a.counts || {}).map(([k, n]) => `${n} ${k.replace(/([A-Z])/g, " $1").toLowerCase()}`).join(" · ") || "—")}${a.keepUpcoming && (a.parts || []).includes("rsvps") ? " · kept upcoming events" : ""}</td></tr>`).join("")}</table></div>` : `<p class="help" style="margin:0">No clears yet. Each time you clear, the period's dates are recorded here so you can match them to your downloaded files.</p>`}</div>`;
+    $("#ar-dl").addEventListener("click", () => { const n = download(); toast(`Downloaded ${n} records`); });
+    $("#ar-clear").addEventListener("click", () => {
+      const f = $("#ar-flow");
+      f.innerHTML = `
+        <div class="arch-flow">
+          <div class="arch-step" id="st1"><span class="n">1</span><div><b>Download this period first</b><p class="help">Required every time. Saves <code>${esc(fname)}.csv</code> with all ${total} records for ${esc(period)}.</p><button class="btn btn-gold btn-sm" id="st1b">${ic.download} Download CSV</button></div></div>
+          <div class="arch-step off" id="st2"><span class="n">2</span><div><b>Choose what to clear</b>
+            <div class="arch-checks">${counts.map(([k, l, n]) => `<label><input type="checkbox" data-part="${k}" ${k === "subs" ? "" : "checked"} ${n ? "" : "disabled"}> ${esc(l)} <span class="muted">(${n})</span></label>`).join("")}
+              <label class="sub"><input type="checkbox" id="ar-keep" checked> Keep RSVPs for upcoming events (so tickets and check-in still work)</label></div>
+            <p class="help">Subscribers are unticked by default: you probably want to keep your mailing list.</p></div></div>
+          <div class="arch-step off" id="st3"><span class="n">3</span><div><b>Type CLEAR to confirm</b><p class="help">This permanently deletes the selected records from the database. It can't be undone.</p>
+            <div class="tbl-tools" style="margin:0"><input class="input" id="ar-type" placeholder="CLEAR" autocomplete="off" style="max-width:180px;font-family:var(--mono)"><button class="btn btn-sm danger-btn" id="ar-go" disabled>${ic.trash} Clear now</button><button class="btn btn-outline btn-sm" id="ar-cancel">Cancel</button></div></div></div>
+        </div>`;
+      const unlock = () => { $("#st2").classList.remove("off"); $("#st3").classList.remove("off"); $("#st1").classList.add("done"); };
+      $("#st1b").addEventListener("click", () => { download(); unlock(); $("#st1b").innerHTML = `${ic.check} Downloaded`; });
+      $("#ar-type").addEventListener("input", (e) => ($("#ar-go").disabled = e.target.value.trim() !== "CLEAR" || !$("#st1").classList.contains("done")));
+      $("#ar-cancel").addEventListener("click", () => (f.innerHTML = ""));
+      $("#ar-go").addEventListener("click", async () => {
+        const parts = Object.fromEntries($$("[data-part]", f).map((c) => [c.dataset.part, c.checked && !c.disabled]));
+        if (!Object.values(parts).some(Boolean)) return toast("Nothing selected", "error");
+        $("#ar-go").disabled = true;
+        try {
+          const r = await api("clear", { confirm: "CLEAR", parts, keepUpcoming: $("#ar-keep").checked });
+          toast(`Cleared. Period ${r.entry.from ? day(r.entry.from) : "start"} – ${day(r.entry.to)} saved to history`);
+          refreshCounts(); archive(v);
+        } catch (e) { fail(e); $("#ar-go").disabled = false; }
+      });
+      f.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }
+
   async function emails(v) {
-    const NAMES = [["ticket", "RSVP ticket", "Sent to a guest when they RSVP"], ["waitlist", "Waitlist", "Sent when an event is full"], ["application", "Membership application", "Sent when someone applies to join"], ["workshop", "Workshop application", "Sent when someone applies to a workshop"], ["contact", "Contact / sponsorship", "Sent to NOTIFY_EMAIL (the board)"]];
+    const NAMES = [["ticket", "RSVP ticket", "Sent to a guest when they RSVP"], ["waitlist", "Waitlist", "Sent when an event is full"], ["application", "Membership application", "Sent when someone applies to join"], ["workshop", "Workshop application", "Sent when someone applies to a workshop"], ["decision", "Decision ready", "Sent when you email an applicant their decision (same email for every outcome)"], ["contact", "Contact / sponsorship", "Sent to NOTIFY_EMAIL (the board)"]];
     v.innerHTML = `<div class="box">Loading previews…</div>`;
     let data;
     try { data = await api("emails"); } catch (e) { v.innerHTML = `<div class="empty-s">${esc(e.message)}</div>`; return; }
@@ -1125,6 +1249,7 @@
     S.mode = "live";
     const r = await api("content");
     S.content = r.content;
+    S.letterDefaults = r.letterDefaults || {};
     S.published = JSON.stringify(r.published ? r.content : null);
     if (!r.published) toast("Tip: press Publish once to save the starting content to the database.");
     restoreDraft();

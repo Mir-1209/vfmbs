@@ -1,12 +1,13 @@
 // Admin API: a single function (keeps Vercel Hobby under its function limit), routed by ?action=
 import { handler, send, allow, readBody, query, rateLimit, sameOrigin, requireKV, HttpError } from "./_lib/http.js";
-import { cmd, pipe, P, parse, toObj, hgetallJSON, getJSON, setJSON } from "./_lib/kv.js";
+import { cmd, pipe, P, parse, toObj, hgetallJSON, getJSON, setJSON, scanKeys } from "./_lib/kv.js";
 import { checkPassword, sessionCookie, clearCookie, isAdmin, requireAdmin, verifyId } from "./_lib/auth.js";
 import { loadContent, defaultContent } from "./_lib/content.js";
 import { str, email as vEmail } from "./_lib/validate.js";
 import { signId } from "./_lib/auth.js";
 import { siteUrl, sendEmail, emailEnabled } from "./_lib/email.js";
-import { ticketEmail, applicationEmail, workshopEmail, contactEmail } from "./_lib/templates.js";
+import { ticketEmail, applicationEmail, workshopEmail, contactEmail, decisionReadyEmail } from "./_lib/templates.js";
+import { FINAL, programName, DEFAULT_LETTERS } from "./_lib/decision.js";
 
 // Realistic sample data for previews / test sends (built from the live content).
 function sampleEmails(req, c) {
@@ -19,9 +20,26 @@ function sampleEmails(req, c) {
     waitlist: ticketEmail({ base, ev, s: st, t: { token: signId("ticket", "SAMPLE02"), code: "SAMPLE02", no: 3, waitlist: true, name: app.name } }),
     application: applicationEmail({ base, app, id: "VF-SAMPLE", token: signId("app", "VF-SAMPLE"), tracks: c.tracks || [], s: st }),
     workshop: workshopEmail({ base, ws, app, code: "K7M2QX", s: st }),
+    decision: decisionReadyEmail({ base, s: st, name: app.name, ref: "VF-SAMPLE", program: programName("membership", st) }),
     contact: contactEmail({ base, s: st, msg: { name: "Jordan Rivera", email: "jordan@studio.com", org: "Example Studios", topic: "Sponsorship", message: "Hi Greenlight team,\n\nWe'd love to sponsor the Greenlight Summit this year and host a Deal Room case for your members. Could we set up a call next week?\n\nBest,\nJordan", ts: Date.now() } }),
   };
 }
+
+// Email an applicant that their decision letter is ready, and release the letter to them.
+// The email is neutral; the outcome is only shown on /decision with their confirmation number.
+async function notifyDecision(req, app, { kind, ref, ws, s }) {
+  if (!FINAL.includes(app.status)) throw new HttpError(400, "Set the status to accepted, waitlisted or declined first.");
+  const mail = decisionReadyEmail({ base: siteUrl(req), s, name: app.pref || app.name, ref, program: programName(kind, s, ws) });
+  const sent = await sendEmail({ to: app.email, subject: mail.subject, html: mail.html, text: mail.text, kind: "decision" });
+  app.notifiedStatus = app.status;
+  app.notifiedAt = Date.now();
+  app.notifyEmail = sent ? "sent" : emailEnabled() ? "failed" : "not sent (email not connected)";
+  return sent;
+}
+
+// Archive & clear: everything the site stored since the last clear.
+const isUpcoming = (ev) => ev && new Date(ev.end || ev.date) > new Date(Date.now() - 864e5);
+const suffix = (key, prefix) => key.slice((P + prefix).length);
 
 const HISTORY = 15;
 const CONTENT_KEYS = ["settings", "featured", "tracks", "events", "workshops", "team", "partners", "posts", "stats", "top10", "reviews", "faq", "ticker", "sponsorTiers", "pipeline"];
@@ -32,7 +50,7 @@ const GET = {
   async content(req) {
     const saved = await getJSON("content", null);
     const meta = await getJSON("content:meta", null);
-    return { content: saved || (await defaultContent(req)), published: Boolean(saved), meta };
+    return { content: saved || (await defaultContent(req)), published: Boolean(saved), meta, letterDefaults: DEFAULT_LETTERS };
   },
 
   async overview(req) {
@@ -90,6 +108,37 @@ const GET = {
     const out = {};
     for (const [k, v] of Object.entries(all)) out[k] = { subject: v.subject, html: v.html };
     return { enabled: emailEnabled(), templates: out };
+  },
+
+  // Everything stored since the last clear, for the CSV download in Admin → Archive & clear.
+  async archive(req) {
+    const content = await loadContent(req);
+    const events = Object.fromEntries((content.events || []).map((e) => [e.id, e]));
+    const workshops = Object.fromEntries((content.workshops || []).map((w) => [w.id, w]));
+    const rsvps = [];
+    for (const key of await scanKeys("rsvps:*")) {
+      const ev = suffix(key, "rsvps:");
+      for (const r of Object.values(await hgetallJSON(key.slice(P.length)))) rsvps.push({ ...r, eventId: ev, event: events[ev]?.title || ev, eventDate: events[ev]?.date || "", upcoming: isUpcoming(events[ev]) });
+    }
+    const wsapps = [];
+    for (const key of await scanKeys("wsapps:*")) {
+      const ws = suffix(key, "wsapps:");
+      for (const [code, a] of Object.entries(await hgetallJSON(key.slice(P.length)))) wsapps.push({ ...a, code: code.slice(code.lastIndexOf(":") + 1), workshopId: ws, workshop: workshops[ws]?.title || ws });
+    }
+    const [apps, inbox, subs, slots] = await Promise.all(["apps", "inbox", "subs", "slots"].map((k) => hgetallJSON(k)));
+    const [log, arch, lastclear] = await pipe([["LRANGE", P + "emaillog", 0, -1], ["LRANGE", P + "archives", 0, 99], ["GET", P + "lastclear"]]);
+    return {
+      from: Number(lastclear) || null,
+      to: Date.now(),
+      archives: (arch || []).map((x) => parse(x, {})),
+      rsvps,
+      apps: Object.entries(apps).map(([id, a]) => ({ id, ...a })),
+      wsapps,
+      inbox: Object.entries(inbox).map(([id, m]) => ({ id, ...m })),
+      subs: Object.entries(subs).map(([email, m]) => ({ email, ...(typeof m === "object" ? m : {}) })),
+      slots: Object.entries(slots).map(([slot, id]) => ({ slot, id })),
+      emails: (log || []).map((x) => parse(x, {})),
+    };
   },
 
   async history() {
@@ -182,11 +231,16 @@ const POST = {
       await pipe(ops);
       return { ok: true };
     }
-    if (b.status) app.status = ["submitted", "reviewing", "interview", "accepted", "waitlisted", "declined"].includes(b.status) ? b.status : app.status;
+    if (b.status && ["submitted", "reviewing", "interview", "accepted", "waitlisted", "declined"].includes(b.status) && b.status !== app.status) {
+      app.status = b.status;
+      app.decidedAt = FINAL.includes(b.status) ? Date.now() : undefined;
+    }
     if (b.notes != null) app.notes = str(b.notes, "Notes", { max: 4000 });
     if (b.rating != null) app.rating = Math.max(0, Math.min(5, Number(b.rating) || 0));
+    let emailed = null;
+    if (b.notify) emailed = await notifyDecision(req, app, { kind: "membership", ref: id, s: (await loadContent(req)).settings || {} });
     await cmd("HSET", P + "apps", id, JSON.stringify(app));
-    return { ok: true, app: { id, ...app } };
+    return { ok: true, emailed, app: { id, ...app } };
   },
 
   async wsapp(req, b) {
@@ -194,10 +248,101 @@ const POST = {
     const code = str(b.code, "Code", { max: 80, required: true });
     const app = parse(await cmd("HGET", key, code));
     if (!app) throw new HttpError(404, "Not found.");
-    if (b.op === "delete") { await pipe([["HDEL", key, code], ["DEL", `${P}wse:${b.workshopId}:${app.email}`]]); return { ok: true }; }
-    if (["review", "accepted", "waitlisted", "declined"].includes(b.status)) app.status = b.status;
+    const short = code.slice(code.lastIndexOf(":") + 1);
+    if (b.op === "delete") { await pipe([["HDEL", key, code], ["DEL", `${P}wse:${b.workshopId}:${app.email}`], ["DEL", `${P}wscode:${short}`]]); return { ok: true }; }
+    if (["review", "accepted", "waitlisted", "declined"].includes(b.status) && b.status !== app.status) {
+      app.status = b.status;
+      app.decidedAt = FINAL.includes(b.status) ? Date.now() : undefined;
+    }
+    let emailed = null;
+    if (b.notify) {
+      const content = await loadContent(req);
+      const ws = (content.workshops || []).find((w) => w.id === b.workshopId);
+      emailed = await notifyDecision(req, app, { kind: "workshop", ref: short, ws, s: content.settings || {} });
+    }
     await cmd("HSET", key, code, JSON.stringify(app));
-    return { ok: true, app };
+    return { ok: true, emailed, app };
+  },
+
+  // Email everyone with a final decision who hasn't been told about it yet (batched to stay quick).
+  async notifyall(req, b) {
+    const content = await loadContent(req);
+    const s = content.settings || {};
+    const LIMIT = 80;
+    let sent = 0, done = 0, remaining = 0;
+    const due = (a) => FINAL.includes(a.status) && a.notifiedStatus !== a.status && a.email;
+    if (b.kind === "membership") {
+      const all = await hgetallJSON("apps");
+      for (const [id, a] of Object.entries(all)) {
+        if (!due(a)) continue;
+        if (done >= LIMIT) { remaining++; continue; }
+        if (await notifyDecision(req, a, { kind: "membership", ref: id, s })) sent++;
+        await cmd("HSET", P + "apps", id, JSON.stringify(a));
+        done++;
+      }
+    } else if (b.kind === "workshop") {
+      for (const w of content.workshops || []) {
+        const all = await hgetallJSON(`wsapps:${w.id}`);
+        for (const [code, a] of Object.entries(all)) {
+          if (!due(a)) continue;
+          if (done >= LIMIT) { remaining++; continue; }
+          if (await notifyDecision(req, a, { kind: "workshop", ref: code.slice(code.lastIndexOf(":") + 1), ws: w, s })) sent++;
+          await cmd("HSET", `${P}wsapps:${w.id}`, code, JSON.stringify(a));
+          done++;
+        }
+      }
+    } else throw new HttpError(400, "Unknown kind.");
+    return { ok: true, released: done, sent, remaining };
+  },
+
+  // Delete stored records after the board has downloaded the archive CSV.
+  async clear(req, b) {
+    if (b.confirm !== "CLEAR") throw new HttpError(400, 'Type CLEAR to confirm.');
+    const parts = b.parts || {};
+    const keepUpcoming = b.keepUpcoming !== false;
+    const content = await loadContent(req);
+    const events = Object.fromEntries((content.events || []).map((e) => [e.id, e]));
+    const counts = {};
+    const del = [];
+    const ops = [];
+
+    if (parts.rsvps) {
+      counts.rsvps = 0;
+      for (const key of await scanKeys("rsvps:*")) {
+        const ev = suffix(key, "rsvps:");
+        if (keepUpcoming && isUpcoming(events[ev])) continue;
+        const all = toObj(await cmd("HGETALL", key));
+        counts.rsvps += Object.keys(all).length;
+        for (const [code, raw] of Object.entries(all)) {
+          del.push(`${P}ticket:${code}`);
+          const r = parse(raw, {});
+          if (r.email) del.push(`${P}rsvpe:${ev}:${r.email}`);
+        }
+        del.push(key, ...(await scanKeys(`rsvpe:${ev}:*`)));
+        ops.push(["HDEL", P + "counts", ev], ["HDEL", P + "waits", ev]);
+      }
+    }
+    if (parts.apps) {
+      counts.applications = Number(await cmd("HLEN", P + "apps")) || 0;
+      del.push(P + "apps", P + "slots", ...(await scanKeys("appe:*")));
+    }
+    if (parts.ws) {
+      counts.workshopApplications = 0;
+      for (const key of await scanKeys("wsapps:*")) counts.workshopApplications += Number(await cmd("HLEN", key)) || 0;
+      del.push(...(await scanKeys("wsapps:*")), ...(await scanKeys("wse:*")), ...(await scanKeys("wscode:*")));
+    }
+    if (parts.inbox) { counts.messages = Number(await cmd("HLEN", P + "inbox")) || 0; del.push(P + "inbox"); }
+    if (parts.subs) { counts.subscribers = Number(await cmd("HLEN", P + "subs")) || 0; del.push(P + "subs"); }
+    if (parts.emails) { counts.emails = (await cmd("LRANGE", P + "emaillog", 0, -1) || []).length; del.push(P + "emaillog"); }
+
+    const unique = [...new Set(del)];
+    for (let i = 0; i < unique.length; i += 200) ops.push(["DEL", ...unique.slice(i, i + 200)]);
+    await pipe(ops);
+
+    const from = Number(await cmd("GET", P + "lastclear")) || null;
+    const entry = { ts: Date.now(), from, to: Date.now(), counts, parts: Object.keys(parts).filter((k) => parts[k]), keepUpcoming };
+    await pipe([["LPUSH", P + "archives", JSON.stringify(entry)], ["LTRIM", P + "archives", 0, 99], ["SET", P + "lastclear", String(entry.ts)]]);
+    return { ok: true, entry };
   },
 
   async inbox(req, b) {
@@ -222,7 +367,7 @@ const POST = {
     const all = sampleEmails(req, await loadContent(req));
     const m = all[b.type];
     if (!m) throw new HttpError(400, "Unknown template.");
-    const ok = await sendEmail({ to, subject: "[TEST] " + m.subject, html: m.html, text: m.text });
+    const ok = await sendEmail({ to, subject: "[TEST] " + m.subject, html: m.html, text: m.text, kind: "test" });
     if (!ok) throw new HttpError(502, "Resend rejected the email. Check Resend → Emails/Logs (usually an unverified domain or a wrong EMAIL_FROM).");
     return { ok: true };
   },

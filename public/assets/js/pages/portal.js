@@ -139,7 +139,8 @@ V.ready.then((C) => {
     if (app?.submitted && app.token) {
       V.api("apply?t=" + encodeURIComponent(app.token)).then((s) => {
         const cls = /Accepted|Interview/.test(s.status) ? "st-good" : /Not selected/.test(s.status) ? "st-bad" : /Waitlist/.test(s.status) ? "st-wait" : "st-review";
-        $("#app-pill").innerHTML = `<span class="status-pill ${cls}">${esc(s.status)}</span>`;
+        const final = /Accepted|Waitlist|Not selected/.test(s.status);
+        $("#app-pill").innerHTML = final ? `<a class="status-pill ${cls}" href="/decision?code=${encodeURIComponent(app.id)}">${esc(s.status)} · Read letter</a>` : `<span class="status-pill ${cls}">${esc(s.status)}</span>`;
       }).catch(() => {});
     }
     wsIds.forEach((id) => {
@@ -150,6 +151,7 @@ V.ready.then((C) => {
         const [l, c] = map[s.status] || map.review;
         const el = $(`[data-ws-status="${id}"]`);
         if (el) { el.textContent = l; el.className = "status-pill " + c; }
+        if (el && s.status !== "review" && ws[id].code) el.outerHTML = `<a class="status-pill ${c}" href="/decision?code=${encodeURIComponent(ws[id].code)}">${l} · Read letter</a>`;
       }).catch(() => {});
     });
   }

@@ -105,6 +105,7 @@
             </div>
             <div class="ec-col">
               ${credit("Casting by", "Apply", "/apply")}
+              ${credit("Final cut", "Check a decision", "/decision")}
               ${credit("Box office", "My Studio", "/portal")}
               ${credit("Craft services", "Contact", "/contact")}
               ${credit("Legal clearance", "Privacy &amp; Terms", "/privacy")}
