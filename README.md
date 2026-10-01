@@ -106,7 +106,7 @@ Every clear is recorded under **Past periods** with its start and end dates, so 
 - Every public page has a unique title and description, a canonical URL, Open Graph and Twitter tags, and **its own 1200×630 share image** (`public/assets/og/`), so links look right on iMessage, WhatsApp, Slack, LinkedIn, Instagram DMs and X.
 - Search engines get structured data: **Organization + WebSite** on the home page, **Event** listings (dates, venue, free tickets, availability) on the events page, and **Course** listings on the workshops page, built from your live content.
 - `favicon.ico` (16/32/48), SVG and PNG favicons, an Apple touch icon, and a web app manifest.
-- `sitemap.xml` (dated on every deploy) and `robots.txt`. The build step (`scripts/build.mjs`) writes your real domain into all of them, from `SITE_URL` or Vercel's production domain.
+- `sitemap.xml` (dated on every deploy) and `robots.txt`. The build step (`build.mjs`) writes your real domain into all of them, from `SITE_URL` or Vercel's production domain.
 - After launch, add the site in [Google Search Console](https://search.google.com/search-console) and submit `/sitemap.xml`.
 
 ---
@@ -146,7 +146,8 @@ public/                   The website (served as static files)
   assets/js/admin.js      Admin dashboard
   assets/data/content.json  Default content (used until the first publish)
   assets/brand/           Logo, social image, app icons
-scripts/                  dev server, checks, page generator, build (domain + sitemap), set-domain
+scripts/                  dev server, checks, page generator, set-domain
+build.mjs                 Vercel build step: stamps your domain into links, sitemap and robots.txt
 vercel.json               Routing, security headers, caching
 ```
 

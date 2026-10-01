@@ -12,7 +12,7 @@
     "check": "node scripts/check.mjs",
     "set-domain": "node scripts/set-domain.mjs",
     "pages": "python3 scripts/pages.py",
-    "build": "node scripts/build.mjs"
+    "build": "node build.mjs"
   },
   "dependencies": {
     "@vercel/blob": "^2.0.0"
