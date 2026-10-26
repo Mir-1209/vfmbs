@@ -483,7 +483,7 @@ V.ready.then((C) => {
     const drum = (ch, i) => /\d/.test(ch) ? `<span class="od-d" style="--i:${i}"><span class="od-strip">${Array.from({ length: 30 }, (_, k) => `<b>${k % 10}</b>`).join("")}</span></span>` : `<span class="od-s">${esc(ch)}</span>`;
     const src = (u) => { const x = V.safeUrl(u || ""); return /^https:\/\//.test(x) || /^\/[^/]/.test(x) ? x : ""; };
     const poster = (h) => src(h.image)
-      ? `<img src="${esc(src(h.image))}" alt="${esc(h.title)} poster" loading="lazy" decoding="async" style="object-position:${+(h.imagePos?.x ?? 50)}% ${+(h.imagePos?.y ?? 50)}%">`
+      ? `<img src="${esc(src(h.image))}" alt="${esc(h.title)} poster" loading="eager" fetchpriority="low" decoding="async" style="object-position:${+(h.imagePos?.x ?? 50)}% ${+(h.imagePos?.y ?? 50)}%">`
       : `<div class="hp-ph">${V.poster(h.palette || "gold", h.motif || "film", h.artSeed ?? h.title)}<div class="hp-ph-t"><span>${esc(h.studio || "")}</span><b>${esc(h.title)}</b><i>${esc(h.year || "")}</i></div><span class="hp-ph-tag mono">Poster coming soon</span></div>`;
     host.innerHTML = `
       <div class="hits-stage">
@@ -558,8 +558,29 @@ V.ready.then((C) => {
     let hr = 0;
     addEventListener("scroll", () => { if (!hr) hr = requestAnimationFrame(() => { hr = 0; hf(); }); }, { passive: true });
     track.addEventListener("scroll", () => { if (!hr) hr = requestAnimationFrame(() => { hr = 0; hf(); }); }, { passive: true });
-    addEventListener("resize", () => { dims = null; size(); hf(); });
-    size(); hf();
+    // Fit: measure the tallest frame + info card and shrink the frames until it all clears the bottom of the window.
+    const BOTTOM = 46; // timecode bar along the bottom edge + breathing room
+    const fit = () => {
+      track.style.removeProperty("--hw"); track.style.gap = "";
+      if (!pinned()) return;
+      let w = items[0].offsetWidth;
+      for (let k = 0; k < 5; k++) {
+        const top = track.offsetTop, limit = innerHeight - BOTTOM;
+        const tallest = Math.max(...items.map((el) => el.offsetTop + el.offsetHeight)) + 22; // + hover lift / not-centered drop
+        const over = top + tallest - limit;
+        if (over <= 0) break;
+        const frameH = Math.max(...items.map((el) => $(".hit-frame", el).offsetHeight)) || 1;
+        w = Math.max(120, Math.floor(w * (1 - over / frameH) - 2));
+        track.style.setProperty("--hw", w + "px");
+      }
+      // info cards are wider than tiny frames: keep neighbours from touching
+      track.style.gap = `max(clamp(60px, 8vw, 150px), ${Math.max(0, 262 - items[0].offsetWidth)}px)`;
+      dims = null; size();
+    };
+    // re-fit as each poster arrives (its real proportions change the frame height)
+    $$(".hit-poster img", host).forEach((img) => { if (!img.complete) img.addEventListener("load", () => { fit(); hf(); }, { once: true }); });
+    addEventListener("resize", () => { fit(); dims = null; size(); hf(); });
+    fit(); size(); hf();
     // tactile frames: tilt toward the pointer, glass glare follows
     if (matchMedia("(hover: hover)").matches && !RM) $$("[data-tilt-hit]", host).forEach((f) => {
       f.addEventListener("pointermove", (e) => { const b = f.getBoundingClientRect(), x = (e.clientX - b.left) / b.width - 0.5, y = (e.clientY - b.top) / b.height - 0.5; f.style.setProperty("--rx", f1(-y * 10) + "deg"); f.style.setProperty("--ry", f1(x * 12) + "deg"); f.style.setProperty("--gx", f1((x + 0.5) * 100) + "%"); f.style.setProperty("--gy", f1((y + 0.5) * 100) + "%"); });
