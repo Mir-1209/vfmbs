@@ -13,6 +13,10 @@ The official website for Greenlight: a cinematic, streaming-inspired site with r
 The site is built to feel like a night at the movies:
 
 - **Pre-show → leader countdown → velvet curtains** on the first visit each session, with the projector soundtrack on.
+- **The world under the hero:** scrolling walks you out of the theater and through three hand-drawn establishing shots: the **Hollywood Hills** (with a GREENLIGHT sign), **Manhattan at night** (rain, a bridge with traffic, and a camera that dollies into one lit window), and a **stage-door alley** in the rain whose door opens onto daylight. The L.A. sky follows the real time in Los Angeles (dawn, day, golden hour, dusk, night), so the site looks different depending on when you visit. Preview any time of day with `/?tod=dawn`, `day`, `golden`, `dusk` or `night`.
+- **The Hall of Hits:** a white gallery of framed one-sheets. As each poster reaches the center, its box office number rolls in on a mechanical counter. Paste or upload real posters in the admin; until then each film gets a generated placeholder.
+- **Physical objects instead of boxes:** stats print on a roll of admission tickets (click one to tear it off), and the Q&A is a bound screenplay page whose answers come off the typewriter.
+- **Page transitions** rotate between a film burn, an iris, a clapperboard slate (with the page as the scene name), a reel change and a whip pan.
 - **WebGL projector theater** on the home page: a volumetric beam, floating dust, audience silhouettes and a screen playing the featured title cards with gate weave and splice cuts.
 - **Celluloid everywhere:** a 24fps WebGL film layer adds grain, scratches, dust, hair, flicker and light leaks, and pages change with a **film-burn** transition.
 - **Saul Bass–style posters** are generated for every event, workshop, story and track (or use a real photo, which gets a duotone treatment).
@@ -60,7 +64,7 @@ Go to **`/admin`** (there's also a small "Admin" link in the footer).
 | **Workshop apps** | Accept, waitlist or decline (with the same decision email), copy accepted emails, export |
 | **Inbox / Subscribers** | Contact and sponsorship inquiries (reply by email), newsletter list export |
 | **Events, Workshops, Journal, Team, Partners, Tracks** | Add, edit, reorder, duplicate, hide or delete. Pick poster colors and icons, or upload a real photo |
-| **Homepage** | Hero slides, stats, "script to screen" panels, Top 10, reviews, FAQ, ticker, sponsorship packages |
+| **Homepage** | Hero slides, the three world scenes (headline, text and button for L.A., New York and the alley), the **Hall of Hits** (title, studio, year, the number and what it measures, an EST. switch for placeholder figures, and the poster as a link or upload), its footnote, stats (the ticket roll), "script to screen" panels, Top 10, reviews, FAQ (the screenplay page), ticker, sponsorship packages |
 | **Settings** | Announcement bar, applications open/closed, deadline, recruitment timeline, **interview slot generator**, **decision letter text and signer**, emails and socials |
 | **Emails** | Preview every automatic email (ticket, waitlist, membership application, workshop application, decision ready, board notification) on desktop and phone, and send yourself a test |
 | **Archive & clear** | Download everything people submitted (RSVPs, applications, workshop apps, messages, subscribers and a log of every email sent) as one CSV, then clear it to keep the free database small. See below |

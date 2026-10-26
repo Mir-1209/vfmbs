@@ -2,7 +2,7 @@
 import { handler, send, allow, readBody, query, rateLimit, sameOrigin, requireKV, HttpError } from "./_lib/http.js";
 import { cmd, pipe, P, parse, toObj, hgetallJSON, getJSON, setJSON, scanKeys } from "./_lib/kv.js";
 import { checkPassword, sessionCookie, clearCookie, isAdmin, requireAdmin, verifyId } from "./_lib/auth.js";
-import { loadContent, defaultContent } from "./_lib/content.js";
+import { loadContent, defaultContent, withDefaults } from "./_lib/content.js";
 import { str, email as vEmail } from "./_lib/validate.js";
 import { signId } from "./_lib/auth.js";
 import { siteUrl, sendEmail, emailEnabled } from "./_lib/email.js";
@@ -42,7 +42,7 @@ const isUpcoming = (ev) => ev && new Date(ev.end || ev.date) > new Date(Date.now
 const suffix = (key, prefix) => key.slice((P + prefix).length);
 
 const HISTORY = 15;
-const CONTENT_KEYS = ["settings", "featured", "tracks", "events", "workshops", "team", "partners", "posts", "stats", "top10", "reviews", "faq", "ticker", "sponsorTiers", "pipeline"];
+const CONTENT_KEYS = ["settings", "featured", "tracks", "events", "workshops", "team", "partners", "posts", "stats", "top10", "reviews", "faq", "ticker", "sponsorTiers", "pipeline", "world", "hits"];
 
 const GET = {
   async me(req) { return { admin: isAdmin(req) }; },
@@ -50,7 +50,7 @@ const GET = {
   async content(req) {
     const saved = await getJSON("content", null);
     const meta = await getJSON("content:meta", null);
-    return { content: saved || (await defaultContent(req)), published: Boolean(saved), meta, letterDefaults: DEFAULT_LETTERS };
+    return { content: (await withDefaults(saved, req)) || (await defaultContent(req)), published: Boolean(saved), meta, letterDefaults: DEFAULT_LETTERS };
   },
 
   async overview(req) {

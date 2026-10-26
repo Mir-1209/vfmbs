@@ -168,14 +168,43 @@
   /* =====================================================================
      PAGE TRANSITIONS: film burn → cut → frame roll
      ===================================================================== */
+  // Five ways to cut between pages; a different one each time, so there's always a new one to see.
+  const TX = ["burn", "iris", "clap", "reel", "whip"];
+  const PAGE_NAMES = { "/": "The Premiere", "/events": "Events", "/workshops": "Workshops", "/team": "The Team", "/journal": "The Reel", "/partners": "Partners", "/about": "About", "/apply": "Casting Call", "/contact": "Contact", "/portal": "My Studio", "/privacy": "The Fine Print", "/decision": "Final Cut", "/ticket": "Your Ticket" };
+  function txOverlay(kind, info = {}) {
+    const el = document.createElement("div");
+    el.className = `tx tx-${kind}`;
+    el.setAttribute("aria-hidden", "true");
+    if (kind === "clap") el.innerHTML = `<div class="tx-board"><div class="tx-stick"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="tx-slate"><div class="tx-prod"><span>Prod.</span><b>Greenlight</b></div><div class="tx-grid"><div><span>Scene</span><b>${V.esc(info.name || "")}</b></div><div><span>Take</span><b>${info.take || 1}</b></div><div><span>Roll</span><b>${String(info.roll || 1).padStart(3, "0")}</b></div></div><div class="tx-foot"><span>Dir. You</span><span>${new Date().toLocaleDateString("en-US", { month: "2-digit", day: "2-digit", year: "2-digit" })}</span></div></div></div>`;
+    if (kind === "reel") el.innerHTML = `<i class="tx-cue"></i>`;
+    if (kind === "whip") el.innerHTML = `<i></i><i></i><i></i><i></i><i></i><i></i>`;
+    document.body.append(el);
+    return el;
+  }
+  const irisTo = (el, from, to, ms, x, y) => tween(ms, (p) => { const r = from + (to - from) * ease(p); el.style.background = `radial-gradient(circle at ${x}% ${y}%, transparent ${r}vmax, #000 ${r + 0.4}vmax)`; });
   function transitions() {
     if (RM || page === "admin") return;
     const arriving = ss.get("vfmbs:burn");
     ss.set("vfmbs:burn", null);
+    const info = (() => { try { return JSON.parse(ss.get("vfmbs:txinfo") || "{}"); } catch { return {}; } })();
     if (arriving) {
-      if (Film) { Film.st.burn = 1; requestAnimationFrame(() => Film.burnOut(900)); }
-      document.documentElement.classList.add("frame-roll");
-      setTimeout(() => document.documentElement.classList.remove("frame-roll"), 700);
+      const kind = TX.includes(arriving) ? arriving : "burn";
+      if (kind === "burn") {
+        if (Film) { Film.st.burn = 1; requestAnimationFrame(() => Film.burnOut(900)); }
+        document.documentElement.classList.add("frame-roll");
+        setTimeout(() => document.documentElement.classList.remove("frame-roll"), 700);
+      } else if (kind === "iris") {
+        const el = txOverlay("iris"); irisTo(el, 0, 150, 900, info.x ?? 50, info.y ?? 50).then(() => el.remove());
+      } else if (kind === "clap") {
+        const el = txOverlay("clap", info); el.classList.add("in", "shut");
+        setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 700); }, 260);
+      } else if (kind === "reel") {
+        document.documentElement.classList.add("frame-roll");
+        setTimeout(() => document.documentElement.classList.remove("frame-roll"), 700);
+      } else if (kind === "whip") {
+        const el = txOverlay("whip"); el.classList.add("cover");
+        requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.add("away"); setTimeout(() => el.remove(), 700); }));
+      }
     }
     document.addEventListener("click", (e) => {
       const a = e.target.closest("a[href]");
@@ -185,13 +214,36 @@
       if (url.origin !== location.origin || url.pathname.startsWith("/api/") || /\.\w+$/.test(url.pathname)) return;
       if (url.pathname === location.pathname && url.search === location.search) return;
       e.preventDefault();
-      Sound.whoosh();
-      ss.set("vfmbs:burn", 1);
+      const last = ss.get("vfmbs:lasttx");
+      const pool = TX.filter((k) => k !== last && (k !== "burn" || Film));
+      const kind = pool[Math.floor(Math.random() * pool.length)];
+      ss.set("vfmbs:lasttx", kind);
+      const x = Math.round((e.clientX / innerWidth) * 100) || 50, y = Math.round((e.clientY / innerHeight) * 100) || 50;
+      const take = (+(ss.get("vfmbs:take") || 0) % 9) + 1; ss.set("vfmbs:take", take);
+      const name = PAGE_NAMES[url.pathname] || (a.textContent || "").trim().slice(0, 24) || "Next scene";
+      const meta = { x, y, take, name, roll: Math.floor(Math.random() * 120) + 1 };
+      ss.set("vfmbs:txinfo", JSON.stringify(meta));
+      ss.set("vfmbs:burn", kind);
       const go = () => (location.href = url.href);
-      if (Film) Film.burnIn(620, e.clientX / innerWidth, e.clientY / innerHeight).then(go);
-      else { document.body.style.transition = "opacity .3s"; document.body.style.opacity = 0; setTimeout(go, 300); }
+      if (kind === "burn") { Sound.whoosh(); Film.burnIn(620, x / 100, y / 100).then(go); }
+      else if (kind === "iris") { Sound.whoosh(); const el = txOverlay("iris"); irisTo(el, 150, 0, 560, x, y).then(go); }
+      else if (kind === "clap") {
+        const el = txOverlay("clap", meta);
+        requestAnimationFrame(() => el.classList.add("in"));
+        setTimeout(() => { el.classList.add("shut"); Sound.click(); }, 380);
+        setTimeout(go, 620);
+      } else if (kind === "reel") {
+        const el = txOverlay("reel"); Sound.tick();
+        setTimeout(() => Sound.tick(), 220);
+        setTimeout(() => { el.classList.add("flash"); Sound.click(); }, 420);
+        setTimeout(go, 560);
+      } else {
+        Sound.whoosh(); const el = txOverlay("whip");
+        requestAnimationFrame(() => el.classList.add("cover"));
+        setTimeout(go, 420);
+      }
     });
-    addEventListener("pageshow", (e) => { if (e.persisted && Film) Film.st.burn = 0; });
+    addEventListener("pageshow", (e) => { if (e.persisted) { if (Film) Film.st.burn = 0; $$(".tx").forEach((t) => t.remove()); } });
   }
 
   /* =====================================================================
@@ -371,7 +423,7 @@
     if (a === aspectNow) return;
     aspectNow = a;
     const ratio = ASPECT[a] || 0;
-    const barH = ratio ? Math.max(0, (innerHeight - innerWidth / ratio) / 2) : 0;
+    const barH = ratio && innerWidth > innerHeight ? Math.max(0, (innerHeight - innerWidth / ratio) / 2) : 0; // no letterbox on portrait phones
     document.documentElement.style.setProperty("--lb", Math.min(barH, innerHeight * 0.16) + "px");
     V.hudAspect?.(ratio ? a + ":1" : "OPEN GATE");
   }

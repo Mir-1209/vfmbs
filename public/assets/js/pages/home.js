@@ -118,25 +118,27 @@ V.ready.then(async (C) => {
       <div class="board-notes"><h3>${esc(p.title)}</h3><div class="board-sub">${esc(p.sub)}</div><p>${esc(p.text)}</p></div>
     </article>`).join("");
 
-  /* ================= SC.06 BOX OFFICE (split-flap) ================= */
-  const flap = (str) => [...String(str)].map((ch) => `<span class="flap" data-ch="${esc(ch)}"><i>${esc(ch)}</i></span>`).join("");
-  $("#board").innerHTML = (C.stats || []).map((s) => `<div class="board-row"><span class="board-lbl">${esc(s.label)}</span><span class="board-val">${flap(String(s.n).padStart(3, " ") + (s.suffix || " "))}</span></div>`).join("");
-  new IntersectionObserver(([e], o) => {
-    if (!e.isIntersecting) return; o.disconnect();
-    const chars = " 0123456789+%$ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    $$("#board .flap").forEach((f, idx) => {
-      const target = f.dataset.ch; let n = 6 + Math.floor(Math.random() * 10);
-      const i = $("i", f);
-      const step = () => {
-        if (n-- <= 0) { i.textContent = target; f.classList.remove("flip"); return; }
-        f.classList.remove("flip"); void f.offsetWidth; f.classList.add("flip");
-        i.textContent = chars[Math.floor(Math.random() * chars.length)];
-        if (idx % 3 === 0) V.sfx.tick();
-        setTimeout(step, 70);
-      };
-      setTimeout(step, idx * 40);
-    });
-  }, { threshold: 0.4 }).observe($("#board"));
+  /* ================= SC.08 THE NUMBERS: a roll of admission tickets ================= */
+  const board = $("#board");
+  board.className = "troll";
+  const serial = (i) => "GL " + String(V.hash("serial" + i) % 900000 + 100000);
+  board.innerHTML = `
+    <div class="troll-spool" aria-hidden="true"><i></i></div>
+    <div class="troll-strip" role="list">${(C.stats || []).map((st, i) => `
+      <button class="tk" role="listitem" style="--i:${i}" data-cursor="Tear" aria-label="${esc(st.n + (st.suffix || "") + " " + st.label)}">
+        <span class="tk-admit mono">Admit one · ${serial(i)}</span>
+        <span class="tk-n"><span data-count-to="${Number(st.n) || 0}">0</span><small>${esc(st.suffix || "")}</small></span>
+        <span class="tk-l">${esc(st.label)}</span>
+        <span class="tk-fine mono">Greenlight Picture House · ${esc(S.season || "")} · Non-transferable</span>
+      </button>`).join("")}
+    </div>`;
+  new IntersectionObserver(([e], o) => { if (e.isIntersecting) { board.classList.add("rolling"); o.disconnect(); } }, { threshold: 0.35 }).observe(board);
+  // tear a ticket off the roll: it drops, the machine prints a fresh one
+  $$(".tk", board).forEach((t) => t.addEventListener("click", () => {
+    if (t.classList.contains("torn")) return;
+    t.classList.add("torn"); V.sfx.whoosh?.();
+    setTimeout(() => { t.classList.remove("torn"); t.classList.add("reprint"); setTimeout(() => t.classList.remove("reprint"), 700); }, 1100);
+  }));
 
   /* ================= SC.07 STARRING ================= */
   const roles = { deal: "The Financier", studio: "The Studio Chief", content: "The Showrunner", venture: "The Producer" };
@@ -196,8 +198,24 @@ V.ready.then(async (C) => {
   }
 
   /* ================= SC.12 Q&A ================= */
-  $("#faq-list").innerHTML = (C.faq || []).map((f) => `<details><summary>${esc(f.q)}</summary><p>${esc(f.a)}</p></details>`).join("");
-  $$("#faq-list details").forEach((d) => d.addEventListener("toggle", () => { if (d.open) $$("#faq-list details").forEach((o) => o !== d && (o.open = false)); }));
+  const askers = ["FIRST-YEAR (O.S.)", "SOPHOMORE", "ECON MAJOR", "FILM STUDENT", "SENIOR (CONT'D)", "TRANSFER STUDENT", "STUDIO EXEC (V.O.)"];
+  $("#faq-list").innerHTML = `
+    <div class="sp-brads" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="sp-top mono"><span>GREENLIGHT · “POST-SCREENING Q&amp;A” · ${esc(S.season || "")}</span><span>${(C.faq || []).length + 87}.</span></div>
+    <p class="sp-slug">INT. SARRATT CINEMA - AFTER THE CREDITS</p>
+    <p class="sp-action">The house lights come up. Popcorn everywhere. A hand goes up in the third row.</p>
+    ${(C.faq || []).map((f, i) => `<details class="sp-beat"><summary><span class="sp-char">${esc(f.who || askers[i % askers.length])}</span><span class="sp-dia"><span class="hl">${esc(f.q)}</span></span></summary><div class="sp-ans"><span class="sp-char">THE BOARD</span><span class="sp-dia" data-full="${esc(f.a)}"></span></div></details>`).join("")}
+    <p class="sp-trans">FADE OUT.</p>`;
+  $$("#faq-list details").forEach((d) => d.addEventListener("toggle", () => {
+    if (!d.open) return;
+    $$("#faq-list details").forEach((o) => o !== d && (o.open = false));
+    // the board's answer comes off the typewriter
+    const el = $(".sp-ans .sp-dia", d), full = el.dataset.full;
+    if (el.dataset.done || V.reduced) { el.textContent = full; return; }
+    el.dataset.done = 1; let n = 0;
+    const type = () => { n = Math.min(full.length, n + 3); el.textContent = full.slice(0, n); if (n % 24 < 3) V.sfx.tick?.(); if (n < full.length) setTimeout(type, 16); };
+    type();
+  }));
 
   V.fx.scan();
 

@@ -54,8 +54,8 @@ def head(title, desc, path, extra=""):
 <link rel="stylesheet" href="/assets/css/cinema.css">
 {extra}</head>'''
 
-def scripts(*pages):
-    s = "\n".join(f'<script defer src="/assets/js/pages/{p}.js"></script>' for p in pages)
+def scripts(*pages, pre=()):
+    s = "\n".join([f'<script defer src="/assets/js/{p}.js"></script>' for p in pre] + [f'<script defer src="/assets/js/pages/{p}.js"></script>' for p in pages])
     return f'''
 <noscript><p>This site needs JavaScript for events, RSVPs and applications. Email us at vfmbs@vanderbilt.edu.</p></noscript>
 <script defer src="/assets/vendor/qrcode.js"></script>
@@ -105,7 +105,7 @@ def mq(a, b, c, d, dirn="left"):
     one = f'<span>{a} <img src="/assets/brand/logo.svg" alt=""> <em>{b}</em> <img src="/assets/brand/logo.svg" alt=""></span><span class="outline">{c} ✦ {d} ✦</span>'
     return f'  <section class="marquee-big" aria-hidden="true"><div class="mq" data-dir="{dirn}">{one}{one}</div></section>\n'
 
-pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Media", "The business behind the screen. Vanderbilt's society for film finance, media strategy, streaming, music and sports business: events, workshops and industry treks.", "/", f'<script type="application/ld+json">{ORG_LD}</script>\n') + f'''
+pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Media", "The business behind the screen. Vanderbilt's society for film finance, media strategy, streaming, music and sports business: events, workshops and industry treks.", "/", f'<link rel="stylesheet" href="/assets/css/world.css">\n<script type="application/ld+json">{ORG_LD}</script>\n') + f'''
 <body data-page="home">
 <main id="main">
   <h1 class="sr-only">Vanderbilt Greenlight: the business behind the screen</h1>
@@ -127,8 +127,15 @@ pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Medi
     <div class="exit-sign" aria-hidden="true">EXIT</div>
   </section>
 
-  <!-- SC.02 MARQUEE -->
-  <section class="marquee-scene" data-scene="SC.02 · EXT. MARQUEE · NIGHT">
+  <!-- SC.02 THE WORLD: establishing shots, scrubbed by scroll -->
+  <section class="world" id="world" data-aspect="1.85" data-scene="SC.02 · EXT. HOLLYWOOD HILLS" aria-label="Where films get made, financed and seen"></section>
+
+  <!-- SC.03 THE HALL OF HITS -->
+  <section class="hits" id="hits" data-scene="SC.03 · INT. HALL OF HITS · DAY" aria-label="Box office hall of hits"></section>
+  <div class="hits-out" aria-hidden="true"><p>House lights down · please silence your phones</p></div>
+
+  <!-- SC.04 MARQUEE -->
+  <section class="marquee-scene" data-scene="SC.04 · EXT. MARQUEE · NIGHT">
     <div class="marquee-sign">
       <div class="bulbs top"></div><div class="bulbs bottom"></div><div class="bulbs left"></div><div class="bulbs right"></div>
       <div class="mq-crown"><img src="/assets/brand/logo.svg" alt=""><span>Greenlight</span><em>Picture House</em></div>
@@ -140,8 +147,8 @@ pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Medi
 
   <section class="marquee-big" aria-hidden="true"><div class="mq">{MARQ}{MARQ}</div></section>
 
-  <!-- SC.03 THE REEL -->
-  <section class="reel" id="reel" data-scene="SC.03 · THE PROGRAM">
+  <!-- SC.05 THE REEL -->
+  <section class="reel" id="reel" data-scene="SC.05 · THE PROGRAM">
     <div class="container reel-head">
       <div><p class="eyebrow">Reel 01 · The program</p><h2 class="h2" style="margin:0">Drag the <em>film.</em></h2></div>
       <div class="reel-ctl"><span class="mono" id="reel-ft">0000 FT</span><div class="reel-meter" id="reel-meter"><i></i></div><button class="icon-btn" id="reel-prev" aria-label="Previous">‹</button><button class="icon-btn" id="reel-next" aria-label="Next">›</button></div>
@@ -155,8 +162,8 @@ pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Medi
     </div>
   </section>
 
-  <!-- SC.04 MAIN TITLES -->
-  <section class="seq" data-seq data-aspect="2.39" data-scene="SC.04 · MAIN TITLES">
+  <!-- SC.06 MAIN TITLES -->
+  <section class="seq" data-seq data-aspect="2.39" data-scene="SC.06 · MAIN TITLES">
     <div class="seq-stage">
       <div class="seq-card c1"><div class="seq-art bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><h2><span>Every film</span><span>has two</span><span><em>scripts.</em></span></h2></div>
       <div class="seq-card c2"><div class="seq-art eye"><i></i><b></b></div><h2><span>One is written</span><span>for the <em>screen.</em></span></h2></div>
@@ -166,8 +173,8 @@ pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Medi
     </div>
   </section>
 
-  <!-- SC.05 STORYBOARD -->
-  <section class="pipeline storyboard" aria-label="From script to screen" data-scene="SC.05 · STORYBOARD">
+  <!-- SC.07 STORYBOARD -->
+  <section class="pipeline storyboard" aria-label="From script to screen" data-scene="SC.07 · STORYBOARD">
     <div class="pipe-sticky">
       <div class="pipe-head">
         <div><p class="eyebrow">Storyboard · From script to screen</p><h2 class="h2" style="margin:0">How a film <em>gets made</em><br>(and paid for).</h2></div>
@@ -178,16 +185,16 @@ pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Medi
     </div>
   </section>
 
-  <!-- SC.06 BOX OFFICE -->
-  <section class="section boxoffice" data-scene="SC.06 · THE NUMBERS">
+  <!-- SC.08 BOX OFFICE -->
+  <section class="section boxoffice" data-scene="SC.08 · THE NUMBERS">
     <div class="container">
       <div class="sec-head"><div><p class="eyebrow">Box office</p><h2 class="h2" style="margin:0">The <em>numbers.</em></h2></div><p class="lede">Updated every season. Arrivals only, no departures.</p></div>
       <div class="departure" id="board"></div>
     </div>
   </section>
 
-  <!-- SC.07 STARRING -->
-  <section class="section starring" data-aspect="1.85" data-scene="SC.07 · THE CAST">
+  <!-- SC.09 STARRING -->
+  <section class="section starring" data-aspect="1.85" data-scene="SC.09 · THE CAST">
     <div class="container">
       <p class="eyebrow">Four tracks · pick your role</p>
       <div class="starring-word" aria-hidden="true">Starring</div>
@@ -197,22 +204,22 @@ pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Medi
     <div class="bill-peek" id="bill-peek" aria-hidden="true"></div>
   </section>
 
-  <!-- SC.08 THE PITCH -->
-  <section class="section pt0" data-scene="SC.08 · THE PITCH MEETING"><div class="container"><div class="sim reveal spot" id="sim"></div></div></section>
+  <!-- SC.10 THE PITCH -->
+  <section class="section pt0" data-scene="SC.10 · THE PITCH MEETING"><div class="container"><div class="sim reveal spot" id="sim"></div></div></section>
 
-  <!-- SC.09 THE TRADES -->
-  <section class="section trades-scene" data-scene="SC.09 · THE TRADES"><div class="container"><div class="trades reveal" id="trades"></div></div></section>
+  <!-- SC.11 THE TRADES -->
+  <section class="section trades-scene" data-scene="SC.11 · THE TRADES"><div class="container"><div class="trades reveal" id="trades"></div></div></section>
 
-  <!-- SC.10 REVIEWS -->
-  <section class="section reviews-scene" data-scene="SC.10 · THE REVIEWS">
+  <!-- SC.12 REVIEWS -->
+  <section class="section reviews-scene" data-scene="SC.12 · THE REVIEWS">
     <div class="container">
       <div class="laurels reveal">{laurel("Now casting", "Fall 2026", "All majors welcome")}{laurel("Where", "Finance × Film", "Meet")}{laurel("Filmed on location", "Nashville", "Music City")}</div>
       <div class="blurbs" id="reviews"></div>
     </div>
   </section>
 
-  <!-- SC.11 TICKET BOOTH -->
-  <section class="section booth" data-aspect="1.85" data-scene="SC.11 · THE BOX OFFICE">
+  <!-- SC.13 TICKET BOOTH -->
+  <section class="section booth" data-aspect="1.85" data-scene="SC.13 · THE BOX OFFICE">
     <div class="container">
       <p class="eyebrow center">The box office is open</p>
       <h2 class="h-display center" data-split>Your first credit <em>starts here.</em></h2>
@@ -231,16 +238,16 @@ pages["index.html"] = head("Vanderbilt Greenlight · The Business of Film & Medi
     </div>
   </section>
 
-  <!-- SC.12 Q&A -->
-  <section class="section pt0" id="faq" data-scene="SC.12 · POST-SCREENING Q&amp;A">
+  <!-- SC.14 Q&A -->
+  <section class="section pt0" id="faq" data-scene="SC.14 · POST-SCREENING Q&amp;A">
     <div class="container">
       <h2 class="h2 center reveal">Post-screening <em>Q&amp;A</em></h2>
-      <div class="faq reveal" id="faq-list" style="margin-top:30px"></div>
+      <div class="script-page reveal" id="faq-list"></div>
       <p class="center" style="margin:44px 0 16px;font-size:18px">Get event drops and deadlines before anyone else.</p>
       <form class="signup" data-signup="home" novalidate><input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true"><input type="email" name="email" placeholder="Email address" aria-label="Email address" required><button class="btn btn-gold" type="submit">Get on the list</button></form>
     </div>
   </section>
-</main>''' + scripts("home")
+</main>''' + scripts("home", pre=["world"])
 
 pages["events.html"] = head("Events · Greenlight", "Speaker series, screenings, industry treks and the Greenlight Summit. RSVP in one click and get your ticket.", "/events") + fill(f'''
 <body data-page="events">

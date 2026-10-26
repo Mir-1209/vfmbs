@@ -22,9 +22,17 @@ export async function defaultContent(req) {
   return defaults || {};
 }
 
+// Sections added to the site after a board's last publish come from the defaults until they're edited.
+export async function withDefaults(saved, req) {
+  if (!saved) return saved;
+  const d = await defaultContent(req);
+  for (const k of Object.keys(d)) if (saved[k] === undefined) saved[k] = d[k];
+  return saved;
+}
+
 export async function loadContent(req) {
   const saved = hasKV() ? await getJSON("content", null) : null;
-  return saved || (await defaultContent(req));
+  return (await withDefaults(saved, req)) || (await defaultContent(req));
 }
 
 export const isPublished = (x) => x && x.published !== false;

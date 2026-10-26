@@ -66,7 +66,8 @@
    "2026-10-17T16:00:00-05:00",
    "2026-10-17T17:00:00-05:00"
   ],
-  "membershipDues": "Free for first-years · $25/semester after"
+  "membershipDues": "Free for first-years · $25/semester after",
+  "hitsNote": "Figures marked EST. are placeholders until the board updates them. Other totals are approximate lifetime worldwide grosses."
  },
  "featured": [
   {
@@ -1049,5 +1050,129 @@
    "GREENLIGHT APPLICANTS",
    "▲ 38.0%"
   ]
+ ],
+ "world": [
+  {
+   "scene": "la",
+   "kicker": "EXT. HOLLYWOOD HILLS · DUSK",
+   "title": "Where films get *made.*",
+   "text": "Every greenlight starts with a slate decision: which stories a studio bets on, and why. Our Studio Strategy track starts on this hill.",
+   "label": "Explore the tracks",
+   "link": "/about"
+  },
+  {
+   "scene": "ny",
+   "kicker": "EXT. MANHATTAN · NIGHT",
+   "title": "Where they get *financed.*",
+   "text": "Up there, in the lit windows, bankers are pricing slate deals, streaming rights and music catalogs. The Deal Desk teaches you to read the term sheet.",
+   "label": "Join the Deal Desk",
+   "link": "/apply"
+  },
+  {
+   "scene": "alley",
+   "kicker": "EXT. STAGE DOOR ALLEY · RAIN",
+   "title": "Where they find an *audience.*",
+   "text": "Festivals, distribution, the creator economy and the box office itself. Walk through the stage door to see what the hits actually made.",
+   "label": "See this season's events",
+   "link": "/events"
+  }
+ ],
+ "hits": [
+  {
+   "id": "hit-odyssey",
+   "title": "The Odyssey",
+   "studio": "Universal",
+   "year": "2026",
+   "metric": "Worldwide box office",
+   "value": 1000000000,
+   "estimate": true,
+   "image": "",
+   "palette": "cobalt",
+   "motif": "spotlight"
+  },
+  {
+   "id": "hit-obsession",
+   "title": "Obsession",
+   "studio": "Focus Features",
+   "year": "2026",
+   "metric": "Worldwide box office",
+   "value": 250000000,
+   "estimate": true,
+   "image": "",
+   "palette": "crimson",
+   "motif": "camera"
+  },
+  {
+   "id": "hit-monster",
+   "title": "Monster: The Lizzie Borden Story",
+   "studio": "Netflix",
+   "year": "2026",
+   "metric": "Views, first 91 days",
+   "value": 50000000,
+   "estimate": true,
+   "image": "",
+   "palette": "mono",
+   "motif": "film"
+  },
+  {
+   "id": "hit-avatar",
+   "title": "Avatar",
+   "studio": "20th Century",
+   "year": "2009",
+   "metric": "Worldwide box office",
+   "value": 2923000000,
+   "estimate": false,
+   "image": "",
+   "palette": "teal",
+   "motif": "palm"
+  },
+  {
+   "id": "hit-insideout2",
+   "title": "Inside Out 2",
+   "studio": "Disney · Pixar",
+   "year": "2024",
+   "metric": "Worldwide box office",
+   "value": 1699000000,
+   "estimate": false,
+   "image": "",
+   "palette": "violet",
+   "motif": "music"
+  },
+  {
+   "id": "hit-topgun",
+   "title": "Top Gun: Maverick",
+   "studio": "Paramount",
+   "year": "2022",
+   "metric": "Worldwide box office",
+   "value": 1496000000,
+   "estimate": false,
+   "image": "",
+   "palette": "ember",
+   "motif": "trophy"
+  },
+  {
+   "id": "hit-barbie",
+   "title": "Barbie",
+   "studio": "Warner Bros.",
+   "year": "2023",
+   "metric": "Worldwide box office",
+   "value": 1446000000,
+   "estimate": false,
+   "image": "",
+   "palette": "crimson",
+   "motif": "ticket"
+  },
+  {
+   "id": "hit-oppenheimer",
+   "title": "Oppenheimer",
+   "studio": "Universal",
+   "year": "2023",
+   "metric": "Worldwide box office",
+   "value": 975000000,
+   "estimate": false,
+   "image": "",
+   "palette": "ember",
+   "motif": "chart"
+  }
  ]
 }
