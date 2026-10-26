@@ -27,6 +27,11 @@ export async function withDefaults(saved, req) {
   if (!saved) return saved;
   const d = await defaultContent(req);
   for (const k of Object.keys(d)) if (saved[k] === undefined) saved[k] = d[k];
+  // posters shipped with the site fill in any film the board hasn't given a poster yet
+  if (Array.isArray(saved.hits) && Array.isArray(d.hits)) {
+    const art = Object.fromEntries(d.hits.filter((h) => h.image).map((h) => [h.id, h.image]));
+    saved.hits = saved.hits.map((h) => (h && !h.image && art[h.id] ? { ...h, image: art[h.id] } : h));
+  }
   return saved;
 }
 

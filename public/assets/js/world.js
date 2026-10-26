@@ -500,7 +500,7 @@ V.ready.then((C) => {
             return `<article class="hit" style="--i:${i}" data-i="${i}">
               <div class="hit-lamp" aria-hidden="true"><i></i></div>
               <div class="hit-frame" data-tilt-hit>
-                <div class="hit-mat"><div class="hit-poster">${poster(h)}</div></div>
+                <div class="hit-mat"><div class="hit-poster${src(h.image) ? " real" : ""}">${poster(h)}</div></div>
                 <div class="hit-glass" aria-hidden="true"></div>
                 <span class="hit-rank mono">No. ${rankOf(h)}</span>
               </div>
@@ -516,7 +516,7 @@ V.ready.then((C) => {
         <p class="hits-note mono">${esc(C.settings?.hitsNote || "")}</p>
         <div class="hits-floor" aria-hidden="true"></div>
       </div>`;
-    const track = $("#hits-track"), items = $$(".hit", host), big = $("#hits-big");
+    const track = $("#hits-track"), items = $$(".hit", host), big = $("#hits-big"), head = $(".hits-head", host);
     const roll = (el) => {
       if (el.classList.contains("rolled")) return;
       el.classList.add("rolled");
@@ -540,6 +540,9 @@ V.ready.then((C) => {
         const prog = clamp(-r.top / (dims.H - vh || 1)), x = -prog * dims.dist;
         shift = x - trackX; trackX = x;
         track.style.transform = `translate3d(${f1(x)}px,0,0)`;
+        // the title steps aside once the frames start sliding under it
+        const ho = (1 - clamp((prog - 0.015) / 0.05)).toFixed(3);
+        if (head.__o !== ho) { head.__o = ho; head.style.opacity = ho; head.style.transform = `translate3d(0, ${f1((1 - ho) * -16)}px, 0)`; }
       }
       let best = -1, bd = 1e9;
       items.forEach((el, i) => {

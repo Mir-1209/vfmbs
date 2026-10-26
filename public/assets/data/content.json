@@ -1086,21 +1086,9 @@
    "metric": "Worldwide box office",
    "value": 1000000000,
    "estimate": true,
-   "image": "",
+   "image": "/assets/posters/the-odyssey.jpg",
    "palette": "cobalt",
    "motif": "spotlight"
-  },
-  {
-   "id": "hit-obsession",
-   "title": "Obsession",
-   "studio": "Focus Features",
-   "year": "2026",
-   "metric": "Worldwide box office",
-   "value": 250000000,
-   "estimate": true,
-   "image": "",
-   "palette": "crimson",
-   "motif": "camera"
   },
   {
    "id": "hit-monster",
@@ -1110,9 +1098,45 @@
    "metric": "Views, first 91 days",
    "value": 50000000,
    "estimate": true,
-   "image": "",
+   "image": "/assets/posters/monster-lizzie-borden.jpg",
    "palette": "mono",
    "motif": "film"
+  },
+  {
+   "id": "hit-insideout2",
+   "title": "Inside Out 2",
+   "studio": "Disney · Pixar",
+   "year": "2024",
+   "metric": "Worldwide box office",
+   "value": 1699000000,
+   "estimate": false,
+   "image": "/assets/posters/inside-out-2.jpg",
+   "palette": "violet",
+   "motif": "music"
+  },
+  {
+   "id": "hit-topgun",
+   "title": "Top Gun: Maverick",
+   "studio": "Paramount",
+   "year": "2022",
+   "metric": "Worldwide box office",
+   "value": 1496000000,
+   "estimate": false,
+   "image": "/assets/posters/top-gun-maverick.jpg",
+   "palette": "ember",
+   "motif": "trophy"
+  },
+  {
+   "id": "hit-obsession",
+   "title": "Obsession",
+   "studio": "Focus Features",
+   "year": "2026",
+   "metric": "Worldwide box office",
+   "value": 250000000,
+   "estimate": true,
+   "image": "/assets/posters/obsession.jpg",
+   "palette": "crimson",
+   "motif": "camera"
   },
   {
    "id": "hit-avatar",
@@ -1125,30 +1149,6 @@
    "image": "",
    "palette": "teal",
    "motif": "palm"
-  },
-  {
-   "id": "hit-insideout2",
-   "title": "Inside Out 2",
-   "studio": "Disney · Pixar",
-   "year": "2024",
-   "metric": "Worldwide box office",
-   "value": 1699000000,
-   "estimate": false,
-   "image": "",
-   "palette": "violet",
-   "motif": "music"
-  },
-  {
-   "id": "hit-topgun",
-   "title": "Top Gun: Maverick",
-   "studio": "Paramount",
-   "year": "2022",
-   "metric": "Worldwide box office",
-   "value": 1496000000,
-   "estimate": false,
-   "image": "",
-   "palette": "ember",
-   "motif": "trophy"
   },
   {
    "id": "hit-barbie",
