@@ -1146,7 +1146,7 @@
    "metric": "Worldwide box office",
    "value": 2923000000,
    "estimate": false,
-   "image": "",
+   "image": "/assets/posters/avatar.jpg",
    "palette": "teal",
    "motif": "palm"
   },
@@ -1158,7 +1158,7 @@
    "metric": "Worldwide box office",
    "value": 1446000000,
    "estimate": false,
-   "image": "",
+   "image": "/assets/posters/barbie.jpg",
    "palette": "crimson",
    "motif": "ticket"
   },
@@ -1170,9 +1170,33 @@
    "metric": "Worldwide box office",
    "value": 975000000,
    "estimate": false,
-   "image": "",
+   "image": "/assets/posters/oppenheimer.jpg",
    "palette": "ember",
    "motif": "chart"
+  },
+  {
+   "id": "hit-scream7",
+   "title": "Scream 7",
+   "studio": "Paramount",
+   "year": "2026",
+   "metric": "Worldwide box office",
+   "value": 200000000,
+   "estimate": true,
+   "image": "/assets/posters/scream-7.jpg",
+   "palette": "crimson",
+   "motif": "camera"
+  },
+  {
+   "id": "hit-residentevil",
+   "title": "Resident Evil",
+   "studio": "Sony Pictures",
+   "year": "2026",
+   "metric": "Worldwide box office",
+   "value": 150000000,
+   "estimate": true,
+   "image": "/assets/posters/resident-evil.jpg",
+   "palette": "crimson",
+   "motif": "film"
   }
  ]
 }
